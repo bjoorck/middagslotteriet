@@ -306,6 +306,649 @@
 
   const DEFAULT_DRAW_COUNT = 7;
 
+  // Startdata: fylls in automatiskt bara första gången appen öppnas på en enhet
+  // (dvs. när ingenting ännu är sparat i localStorage för 'dishes'). Sparar man
+  // sedan ändringar, eller tömmer listan helt, skrivs detta aldrig över igen.
+  const DEFAULT_DISHES_TEXT = `Köttbullar med potatismos: 500 g köttfärs, 1 st gul lök, 1 st ägg, 50 g ströbröd, 1 dl mjölk, 1 tsk salt, 0.5 tsk peppar, 2 msk smör, 800 g potatis, 2 dl mjölk, 50 g smör
+Kalops: 800 g grytbitar av nöt, 3 st lök, 4 st morötter, 4 st kryddpepparkorn, 2 st lagerblad, 2 msk vetemjöl, 2 msk smör, 6 dl vatten, 1 msk buljong, 1 tsk salt, 800 g potatis
+Pannbiff med lök: 600 g nötfärs, 1 st ägg, 0.5 dl ströbröd, 1 dl mjölk, 1 tsk salt, 0.5 tsk peppar, 3 st gul lök, 3 msk smör, 800 g potatis, 2 dl mjölk
+Fläskkotletter med gräddsås: 800 g fläskkotletter, 1 tsk salt, 0.5 tsk peppar, 2 msk smör, 3 dl grädde, 2 msk vetemjöl, 2 dl vatten, 1 msk buljong, 800 g potatis
+Korv stroganoff: 500 g falukorv, 1 st gul lök, 2 msk smör, 400 g krossade tomater, 2 dl grädde, 2 msk tomatpuré, 1 tsk paprikapulver, 0.5 tsk salt, 300 g ris
+Kåldolmar: 1 st vitkålshuvud, 500 g köttfärs, 1 dl ris, 1 st ägg, 1 dl mjölk, 1 tsk salt, 0.5 tsk peppar, 2 msk smör, 2 msk lönnsirap, 800 g potatis
+Janssons frestelse: 6 st potatis, 2 st gul lök, 2 msk smör, 100 g ansjovisfilé, 3 dl grädde, 2 dl mjölk, 0.5 tsk vitpeppar, 100 g ströbröd
+Raggmunk med fläsk: 6 st potatis, 2 dl mjölk, 2 dl vetemjöl, 1 st ägg, 1 tsk salt, 2 msk smör, 400 g bacon
+Pyttipanna: 600 g kokt potatis, 300 g skinka, 2 st gul lök, 4 st ägg, 50 g smör, 0.5 tsk salt, 0.5 tsk peppar, 2 dl rödbetor, 1 dl ketchup
+Isterband med rotmos: 4 st isterband, 800 g potatis, 300 g morot, 300 g kålrot, 50 g smör, 1 dl mjölk, 1 tsk salt, 0.5 tsk vitpeppar
+Rotmos med fläsklägg: 1 st fläsklägg, 800 g potatis, 400 g kålrot, 200 g morot, 50 g smör, 1 dl mjölk, 0.5 tsk vitpeppar
+Ärtsoppa med fläsk: 500 g gula ärtor, 400 g fläsklägg, 1 st gul lök, 1 msk timjan, 1.5 liter vatten, 1 tsk salt, 1 msk senap
+Biff Rydberg: 600 g oxfilé, 800 g potatis, 3 msk smör, 2 st gul lök, 4 st äggula, 1 tsk salt, 0.5 tsk peppar, 2 msk kapris
+Wallenbergare: 700 g kalvfärs, 4 st äggula, 3 dl grädde, 100 g ströbröd, 1 tsk salt, 3 msk smör, 800 g potatis, 3 dl ärtor
+Blodpudding med lingon: 400 g blodpudding, 2 msk smör, 200 g bacon, 1 st äpple
+Ugnspannkaka med bacon: 5 dl mjölk, 3 dl vetemjöl, 4 st ägg, 1 tsk salt, 200 g bacon, 1 msk smör (till formen)
+Lax med potatismos och dillsås: 700 g laxfilé, 1 tsk salt, 800 g potatis, 2 dl mjölk, 50 g smör, 2 dl grädde, 1 dl dill, 2 msk citron, 1 msk vetemjöl
+Kokt torsk med äggsås: 700 g torskfilé, 1 tsk salt, 3 st ägg, 2 dl mjölk, 2 msk smör, 2 msk vetemjöl, 800 g potatis, 1 dl persilja
+Fiskgratäng: 600 g vit fisk, 1 tsk salt, 3 dl grädde, 150 g räkor, 100 g riven ost, 800 g potatis, 2 msk smör, 1 dl dill
+Plättar med lingon: 3 dl vetemjöl, 6 dl mjölk, 3 st ägg, 1 tsk salt, 50 g smör
+Kycklinggryta med curry: 700 g kycklingfilé, 1 st gul lök, 2 msk currypulver, 2 msk olja, 4 dl kokosmjölk, 1 tsk salt, 1 st paprika, 300 g ris
+Kycklingfilé med citron och timjan: 700 g kycklingfilé, 1 st citron, 2 msk timjan, 2 msk olja, 1 tsk salt, 0.5 tsk peppar, 800 g potatis, 200 g broccoli
+Sjömansbiff: 700 g biff av nöt, 6 st potatis, 2 st gul lök, 2 msk smör, 4 dl öl, 2 msk vetemjöl, 1 tsk salt, 0.5 tsk peppar
+Fläskfilé med senapssås: 700 g fläskfilé, 1 tsk salt, 2 msk smör, 3 dl grädde, 2 msk dijonsenap, 800 g potatis, 200 g haricots verts
+Kalvfrikassé: 700 g kalvbog, 2 st morot, 1 st purjolök, 2 msk smör, 2 dl grädde, 2 msk vetemjöl, 6 dl vatten, 1 tsk salt, 300 g ris
+Karelska piroger med äggsmör: 200 g rågmjöl, 300 g rågrisgrynsgröt, 4 st ägg, 100 g smör, 1 tsk salt, 0.5 tsk svartpeppar
+Löksoppa med ost: 6 st gul lök, 3 msk smör, 1 liter buljong, 1 tsk salt, 150 g riven ost, 1 st vitlöksklyfta
+Kroppkakor: 1 kg potatis, 4 dl vetemjöl, 1 st ägg, 1 tsk salt, 300 g fläsktärningar, 1 st gul lök, 100 g smör
+Grönkålssoppa med korv: 400 g grönkål, 400 g falukorv, 1 liter buljong, 2 st potatis, 1 st gul lök, 1 tsk salt, 0.5 tsk peppar
+Spaghetti bolognese: 500 g nötfärs, 1 st gul lök, 2 st vitlöksklyftor, 2 msk olivolja, 800 g krossade tomater, 1 msk tomatpuré, 1 tsk salt, 0.5 tsk peppar, 400 g spaghetti, 50 g parmesan
+Lasagne: 500 g nötfärs, 1 st gul lök, 2 st vitlöksklyftor, 400 g krossade tomater, 1 tsk salt, 12 st lasagneplattor, 5 dl bechamelsås, 150 g riven ost
+Carbonara: 400 g spaghetti, 150 g bacon, 4 st äggula, 100 g parmesan, 0.5 tsk svartpeppar, 1 st vitlöksklyfta, 1 msk olivolja
+Pasta alla vongole: 400 g spaghetti, 600 g musslor, 3 st vitlöksklyftor, 1 dl vitt vin, 0.5 dl olivolja, 1 tsk salt, 0.5 tsk svartpeppar
+Pasta pesto med kyckling: 400 g pasta, 500 g kycklingfilé, 150 g pesto, 50 g parmesan, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Pasta arrabbiata: 400 g penne, 400 g krossade tomater, 2 st vitlöksklyftor, 1 st chili, 0.5 dl olivolja, 1 tsk salt
+Risotto med svamp: 350 g risottoris, 400 g champinjoner, 1 liter buljong, 1 st gul lök, 50 g parmesan, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Pizza margherita: 500 g pizzadeg, 400 g krossade tomater, 250 g mozzarella, 1 dl basilika, 1 tsk salt, 0.5 tsk svartpeppar
+Pizza med skinka och champinjon: 500 g pizzadeg, 300 g krossade tomater, 150 g skinka, 150 g champinjoner, 200 g mozzarella, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Calzone: 500 g pizzadeg, 200 g skinka, 200 g mozzarella, 200 g krossade tomater, 1 tsk salt, 0.5 tsk svartpeppar
+Kycklingschnitzel milanese: 600 g kycklingfilé, 2 st ägg, 2 dl ströbröd, 1 dl parmesan, 1 st citron, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Saltimbocca: 600 g kalvfilé, 8 skivor parmaskinka, 8 blad salvia, 1 dl vitt vin, 50 g smör, 1 tsk salt, 0.5 tsk svartpeppar
+Osso buco: 4 st kalvskankar, 2 st morot, 1 st gul lök, 400 g krossade tomater, 2 dl vitt vin, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Minestrone: 400 g blandade grönsaker, 400 g krossade tomater, 1 liter buljong, 100 g pasta, 400 g vita bönor, 1 tsk salt, 0.5 tsk svartpeppar
+Caprese-sallad med grillad kyckling: 600 g kycklingfilé, 300 g tomat, 200 g mozzarella, 1 dl basilika, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Tacos: 500 g nötfärs, 1 påse tacokrydda, 12 st tortillabröd, 200 g riven ost, 2 st tomat, 1 st isbergssallad, 1 tsk salt, 2 msk olja
+Tacogryta: 500 g nötfärs, 1 påse tacokrydda, 400 g krossade tomater, 400 g majs, 400 g svarta bönor, 1 tsk salt, 2 msk olja
+Fajitas med kyckling: 600 g kycklingfilé, 2 st paprika, 1 st gul lök, 1 påse fajitakrydda, 8 st tortillabröd, 1 tsk salt, 2 msk olja
+Enchiladas: 500 g kycklingfilé, 8 st tortillabröd, 400 g salsa, 200 g riven ost, 200 g gräddfil, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Chili con carne: 600 g nötfärs, 400 g röda bönor, 800 g krossade tomater, 1 st paprika, 1 msk chilipulver, 1 tsk salt, 2 msk olja
+Quesadillas: 8 st tortillabröd, 300 g riven ost, 300 g kycklingfilé, 1 st paprika, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Burritos: 6 st tortillabröd, 500 g nötfärs, 400 g svarta bönor, 200 g ris, 200 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Guacamole-tacos med räkor: 400 g räkor, 2 st avokado, 12 st tortillabröd, 1 st lime, 1 st rödlök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Ceviche: 500 g vit fisk, 3 st lime, 1 st rödlök, 1 st chili, 1 dl koriander
+Kycklingtikka masala: 700 g kycklingfilé, 4 dl krossade tomater, 2 dl grädde, 2 msk garam masala, 300 g ris, 1 tsk salt, 2 msk olja
+Butter chicken: 700 g kycklingfilé, 4 dl krossade tomater, 2 dl grädde, 50 g smör, 2 msk currypasta, 1 tsk salt
+Dahl med linser: 400 g röda linser, 400 g krossade tomater, 2 msk currypulver, 4 dl kokosmjölk, 300 g ris, 1 tsk salt
+Grönsakscurry: 600 g blandade grönsaker, 4 dl kokosmjölk, 2 msk currypasta, 300 g ris, 1 tsk salt
+Palak paneer: 400 g spenat, 250 g paneerost, 2 dl grädde, 2 msk currypulver, 300 g ris, 1 tsk salt
+Kycklingbiryani: 700 g kycklingfilé, 400 g basmatiris, 1 st gul lök, 2 msk garam masala, 1 dl yoghurt, 1 tsk salt, 2 msk olja
+Naanbröd med linsgryta: 400 g röda linser, 4 st naanbröd, 400 g krossade tomater, 2 msk currypulver, 1 tsk salt
+Kycklingwok med grönsaker: 600 g kycklingfilé, 400 g blandade wokgrönsaker, 3 msk soja, 2 msk sesamolja, 300 g nudlar, 1 tsk salt, 0.5 tsk svartpeppar
+Nötkött i oystersås: 500 g biff av nöt, 300 g broccoli, 3 msk ostronsås, 2 msk soja, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Pad thai: 400 g rispasta, 300 g räkor, 3 st ägg, 2 dl böngroddar, 3 msk tamarindpasta, 1 tsk salt, 0.5 tsk svartpeppar
+Kung pao chicken: 600 g kycklingfilé, 100 g jordnötter, 2 st paprika, 3 msk soja, 1 msk chiliflakes, 1 tsk salt, 2 msk olja
+Sötsur fläsk: 600 g fläskytterfilé, 400 g ananas, 1 st paprika, 3 msk ketchup, 2 msk vinäger, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Vårrullar: 200 g nötfärs, 300 g vitkål, 2 st morot, 12 st vårrullsblad, 2 msk soja, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Ramen med fläsk: 500 g fläsksida, 4 portioner nudlar, 1 liter buljong, 4 st ägg, 100 g böngroddar, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Yakisoba: 400 g nudlar, 300 g kycklingfilé, 300 g blandade grönsaker, 3 msk soja, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Teriyakilax: 700 g laxfilé, 3 msk soja, 2 msk honung, 1 msk ingefära, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Sushi med lax och avokado: 400 g sushiris, 300 g lax, 2 st avokado, 4 blad nori, 2 msk risvinäger
+Miso soppa med tofu: 1 liter dashi, 3 msk misopasta, 300 g tofu, 2 st vårlök
+Dumplings med fläsk: 400 g fläskfärs, 2 st vårlök, 24 st dumplingsdegar, 2 msk soja, 1 msk ingefära, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Bibimbap: 400 g nötkött, 300 g ris, 200 g spenat, 200 g morot, 4 st ägg, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Koreansk kycklinggryta: 700 g kycklingfilé, 3 msk gochujang, 2 msk soja, 1 msk honung, 300 g ris, 1 tsk salt, 2 msk olja
+Falafel med hummus: 400 g kikärtor, 1 st gul lök, 2 msk spiskummin, 200 g hummus, 4 st pitabröd, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Halloumigryta: 400 g halloumi, 400 g krossade tomater, 1 st paprika, 1 st zucchini, 300 g couscous, 1 tsk salt, 0.5 tsk svartpeppar
+Grekisk sallad med halloumi: 300 g halloumi, 300 g tomat, 1 st gurka, 100 g kalamataoliver, 100 g rödlök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Moussaka: 500 g nötfärs, 2 st aubergine, 400 g krossade tomater, 5 dl bechamelsås, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Souvlaki med tzatziki: 700 g fläskytterfilé, 200 g grekisk yoghurt, 1 st gurka, 4 st pitabröd, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Ratatouille: 2 st aubergine, 2 st zucchini, 2 st paprika, 400 g krossade tomater, 2 st vitlöksklyftor, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Paella: 400 g kyckling, 300 g räkor, 300 g risottoris, 1 st paprika, 1 tsk saffran, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Spansk tortilla: 6 st ägg, 800 g potatis, 1 st gul lök, 2 msk olivolja, 1 tsk salt, 0.5 tsk svartpeppar
+Tapasfat med kikärtor och chorizo: 300 g chorizo, 400 g kikärtor, 2 st vitlöksklyftor, 1 dl olivolja, 1 tsk salt, 0.5 tsk svartpeppar
+Kikärtsgryta med spenat: 400 g kikärtor, 300 g spenat, 400 g krossade tomater, 2 msk spiskummin, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar
+Fisksoppa: 600 g vit fisk, 200 g räkor, 400 g krossade tomater, 3 dl grädde, 1 st fänkål, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Bouillabaisse: 700 g blandad fisk och skaldjur, 400 g krossade tomater, 1 st fänkål, 1 tsk saffran, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Grillad lax med sparris: 700 g laxfilé, 500 g sparris, 1 st citron, 2 msk olivolja, 1 tsk salt, 0.5 tsk svartpeppar
+Räkpasta med vitlök och chili: 400 g pasta, 500 g räkor, 4 st vitlöksklyftor, 1 st chili, 0.5 dl olivolja, 1 tsk salt
+Scampi: 500 g räkor, 4 st vitlöksklyftor, 1 dl vitt vin, 50 g smör, 1 dl persilja, 1 tsk salt, 0.5 tsk svartpeppar
+Fish and chips: 700 g vit fisk, 2 dl vetemjöl, 3 dl öl, 1 kg potatis, 1 st citron, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Ugnsbakad torsk med rotfrukter: 700 g torskfilé, 400 g morot, 300 g palsternacka, 2 msk smör, 1 tsk salt, 0.5 tsk svartpeppar
+Musslor i vitvinssås: 1.5 kg blåmusslor, 2 dl vitt vin, 3 st vitlöksklyftor, 2 dl grädde, 1 dl persilja, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Bakad potatis med skagenröra: 4 st bakpotatis, 300 g räkor, 1 dl majonnäs, 1 dl dill, 1 st citron
+Halstrad makrill med potatissallad: 4 st makrillfiléer, 600 g potatis, 1 dl majonnäs, 1 st rödlök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Vegetarisk lasagne: 400 g zucchini, 400 g krossade tomater, 12 st lasagneplattor, 5 dl bechamelsås, 150 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar
+Linsbolognese: 400 g gröna linser, 800 g krossade tomater, 1 st gul lök, 400 g spaghetti, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Vegetarisk chili sin carne: 400 g röda bönor, 400 g svarta bönor, 800 g krossade tomater, 1 st paprika, 1 tsk salt, 0.5 tsk svartpeppar
+Halloumiburgare: 400 g halloumi, 4 st hamburgerbröd, 1 st tomat, 1 st isbergssallad, 2 msk majonnäs, 1 tsk salt, 0.5 tsk svartpeppar
+Grönsaksbiffar: 400 g morot, 200 g havregryn, 2 st ägg, 1 st gul lök, 4 st hamburgerbröd, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Vegetarisk wok: 500 g blandade wokgrönsaker, 300 g tofu, 3 msk soja, 300 g nudlar, 1 tsk salt, 0.5 tsk svartpeppar
+Zucchinilasagne: 4 st zucchini, 400 g krossade tomater, 300 g ricotta, 150 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar
+Svampgryta med kokosmjölk: 500 g champinjoner, 4 dl kokosmjölk, 2 msk currypasta, 300 g ris, 1 tsk salt, 2 msk olja
+Linssoppa: 400 g röda linser, 1 liter buljong, 1 st gul lök, 2 st morot, 1 msk spiskummin, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Blomkålscurry: 1 st blomkålshuvud, 4 dl kokosmjölk, 2 msk currypasta, 300 g ris, 1 tsk salt
+Quornbullar med potatismos: 400 g quornfärs, 800 g potatis, 2 dl mjölk, 1 st gul lök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Vegetarisk paj med fetaost: 300 g bladspenat, 200 g fetaost, 1 st pajdeg, 3 st ägg, 2 dl grädde, 1 tsk salt, 0.5 tsk svartpeppar
+Hamburgare med bacon: 600 g nötfärs, 4 st hamburgerbröd, 8 skivor bacon, 100 g cheddarost, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Cheeseburgare: 600 g nötfärs, 4 st hamburgerbröd, 4 skivor cheddarost, 1 st tomat, 1 st isbergssallad, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+BBQ-revben: 1.2 kg revben, 2 dl bbq-sås, 1 msk paprikapulver, 800 g potatis, 1 tsk salt
+Pulled pork: 1.5 kg fläskkarré, 2 dl bbq-sås, 1 msk paprikapulver, 6 st hamburgerbröd, 1 tsk salt, 2 msk smör
+Grillad kyckling med chimichurri: 700 g kycklingfilé, 1 dl olivolja, 1 dl persilja, 2 st vitlöksklyftor, 1 tsk salt, 0.5 tsk svartpeppar
+Grillspett med fläsk: 700 g fläskytterfilé, 1 st paprika, 1 st gul lök, 2 msk grillkrydda, 1 tsk salt, 2 msk smör
+Entrecote med bearnaisesås: 700 g entrecote, 200 g bearnaisesås, 6 st potatis, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Flankstek med chimichurri: 700 g flankstek, 1 dl olivolja, 1 dl persilja, 2 st vitlöksklyftor, 1 tsk salt, 0.5 tsk svartpeppar
+Grillad halloumi med couscous: 400 g halloumi, 300 g couscous, 1 st paprika, 1 st zucchini, 1 tsk salt, 0.5 tsk svartpeppar
+Pulled chicken tacos: 600 g kycklingfilé, 2 dl bbq-sås, 8 st tortillabröd, 1 st vitkål, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Korv med bröd: 8 st grillkorv, 8 st korvbröd, 1 dl senap, 1 dl ketchup, 1 st rödlök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Grillad lax med citron och rosmarin: 700 g laxfilé, 1 st citron, 2 kvistar rosmarin, 2 msk olivolja, 1 tsk salt, 0.5 tsk svartpeppar
+Hasselbackspotatis med fläskfilé: 700 g fläskfilé, 800 g potatis, 50 g smör, 2 dl grädde, 1 tsk salt, 0.5 tsk svartpeppar
+Kycklinggratäng: 600 g kycklingfilé, 300 g broccoli, 3 dl grädde, 150 g riven ost, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Pyttig fisk med kapris: 600 g vit fisk, 2 msk kapris, 400 g potatis, 2 msk smör, 1 tsk salt, 0.5 tsk svartpeppar
+Kalkonschnitzel: 600 g kalkonfilé, 2 st ägg, 2 dl ströbröd, 800 g potatis, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Fläskytterfilé med äppelsås: 700 g fläskytterfilé, 3 st äpplen, 2 msk smör, 1 msk kanel, 1 tsk salt
+Kycklingsallad med avokado: 500 g kycklingfilé, 2 st avokado, 1 st isbergssallad, 200 g körsbärstomater, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Tonfisksallad: 300 g tonfisk, 1 st isbergssallad, 200 g körsbärstomater, 100 g oliver, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Kycklingsoppa med nudlar: 500 g kycklingfilé, 200 g nudlar, 1 liter buljong, 2 st morot, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Köttfärslimpa: 700 g nötfärs, 1 st ägg, 1 dl ströbröd, 1 dl mjölk, 800 g potatis, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Sockerärtor med kyckling och sesam: 600 g kycklingfilé, 300 g sockerärtor, 2 msk sesamolja, 3 msk soja, 1 tsk salt, 0.5 tsk svartpeppar
+Fläskfilé i ugn med rotfrukter: 700 g fläskfilé, 400 g morot, 300 g palsternacka, 2 msk olja, 1 tsk salt, 0.5 tsk svartpeppar
+Krämig svampsås med biff: 600 g biff av nöt, 400 g champinjoner, 3 dl grädde, 800 g potatis, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Kalvsteak med potatisgratäng: 600 g kalvfilé, 800 g potatis, 3 dl grädde, 100 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Kycklingsoppa med grönsaker: 600 g kycklingfilé, 1 liter buljong, 3 st morot, 2 st potatis, 1 st purjolök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Tomatsoppa med basilika: 1 kg tomater, 1 liter buljong, 1 dl grädde, 1 dl basilika, 2 st vitlöksklyftor, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Broccolisoppa: 600 g broccoli, 1 liter buljong, 2 dl grädde, 1 st gul lök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Pumpasoppa: 800 g pumpa, 1 liter buljong, 2 dl grädde, 1 msk ingefära, 1 tsk salt, 0.5 tsk svartpeppar
+Morotssoppa med ingefära: 800 g morot, 1 liter buljong, 2 dl grädde, 1 msk ingefära, 1 tsk salt, 0.5 tsk svartpeppar
+Potatis- och purjolökssoppa: 600 g potatis, 3 st purjolök, 1 liter buljong, 2 dl grädde, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Svampsoppa: 600 g champinjoner, 1 liter buljong, 2 dl grädde, 1 st gul lök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Fisksoppa thailändsk stil: 600 g vit fisk, 4 dl kokosmjölk, 2 msk currypasta, 1 st lime, 1 dl koriander, 1 tsk salt, 2 msk olja
+Nudelsoppa med kyckling: 500 g kycklingfilé, 200 g nudlar, 1 liter buljong, 2 st morot, 1 dl koriander, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Gulaschsoppa: 600 g grytbitar av nöt, 1 liter buljong, 2 st paprika, 800 g krossade tomater, 1 msk paprikapulver, 1 tsk salt
+Fransk löksoppa: 6 st gul lök, 1 liter buljong, 50 g smör, 150 g gruyereost, 1 tsk salt, 0.5 tsk svartpeppar
+Linssoppa med korv: 400 g röda linser, 300 g falukorv, 1 liter buljong, 2 st morot, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Kimchisoppa med tofu: 400 g kimchi, 300 g tofu, 1 liter buljong, 2 st vårlök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Kycklingsallad med curry och äpple: 500 g kycklingfilé, 2 st äpple, 2 msk currypulver, 1 dl majonnäs, 100 g sallad, 1 tsk salt, 2 msk olja
+Quinoasallad med fetaost: 300 g quinoa, 200 g fetaost, 200 g körsbärstomater, 100 g oliver, 1 tsk salt, 0.5 tsk svartpeppar
+Räksallad med avokado: 400 g räkor, 2 st avokado, 100 g sallad, 1 st citron, 1 tsk salt, 0.5 tsk svartpeppar
+Pastasallad med kyckling: 300 g pasta, 500 g kycklingfilé, 200 g körsbärstomater, 100 g pesto, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Nicoisesallad: 300 g tonfisk, 400 g potatis, 200 g haricots verts, 4 st ägg, 100 g oliver, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Rostbiffsallad: 400 g rostbiff, 100 g sallad, 100 g rostade lökringar, 2 msk pepparrotsröra, 1 tsk salt, 2 msk smör
+Räkmacka: 400 g räkor, 4 st ägg, 1 dl majonnäs, 1 st isbergssallad, 1 tsk salt, 0.5 tsk svartpeppar
+Club sandwich: 300 g kycklingfilé, 150 g bacon, 2 st tomat, 1 st isbergssallad, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Halloumiwrap: 4 st tortillabröd, 400 g halloumi, 100 g sallad, 2 msk hummus, 1 tsk salt, 0.5 tsk svartpeppar
+Falafelwrap: 4 st tortillabröd, 400 g kikärtor, 1 st gurka, 1 dl tzatziki, 1 tsk salt, 0.5 tsk svartpeppar
+Kycklingwrap med bbq: 4 st tortillabröd, 400 g kycklingfilé, 2 dl bbq-sås, 1 st isbergssallad, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Gyros i pitabröd: 600 g fläskytterfilé, 4 st pitabröd, 200 g tzatziki, 1 st tomat, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Bönröra med rostat bröd: 400 g vita bönor, 2 st vitlöksklyftor, 0.5 dl olivolja, 1 tsk salt, 0.5 tsk svartpeppar
+Getostmacka med honung: 300 g getost, 3 msk honung, 100 g valnötter, 1 tsk salt, 0.5 tsk svartpeppar
+Boeuf bourguignon: 800 g grytbitar av nöt, 200 g bacon, 12 st smålök, 300 g champinjoner, 4 dl rödvin, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Coq au vin: 1 st kyckling i delar, 200 g bacon, 300 g champinjoner, 4 dl rödvin, 12 st smålök, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Ratatouillegryta med korv: 500 g falukorv, 2 st aubergine, 2 st zucchini, 400 g krossade tomater, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Gulasch wienerstil: 800 g grytbitar av nöt, 3 st gul lök, 2 msk paprikapulver, 800 g krossade tomater, 1 tsk salt, 2 msk smör
+Wienerschnitzel: 600 g kalvfilé, 2 st ägg, 2 dl ströbröd, 1 st citron, 800 g potatis, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Sauerbraten: 1 kg grytbitar av nöt, 2 dl rödvinsvinäger, 2 st gul lök, 4 st lagerblad, 2 msk vetemjöl, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Currywurst: 6 st grillkorv, 2 dl ketchup, 1 msk currypulver, 800 g potatis, 1 tsk salt, 2 msk olja
+Kartoffelpuffer med äppelmos: 800 g potatis, 2 st ägg, 1 dl vetemjöl, 400 g äppelmos, 1 tsk salt, 0.5 tsk svartpeppar
+Schweizer rösti med bacon: 800 g potatis, 200 g bacon, 50 g smör, 1 tsk salt, 0.5 tsk svartpeppar
+Gemüseeintopf: 600 g blandade grönsaker, 1 liter buljong, 400 g korv, 2 st potatis, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Provencalsk kycklinggryta: 700 g kycklingfilé, 200 g oliver, 400 g krossade tomater, 1 st fänkål, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Cassoulet: 500 g vita bönor, 400 g fläskkorv, 300 g bacon, 400 g krossade tomater, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Quiche lorraine: 1 st pajdeg, 200 g bacon, 4 st ägg, 3 dl grädde, 150 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar
+Croque madame: 200 g skinka, 200 g riven ost, 4 st ägg, 1 tsk salt, 0.5 tsk svartpeppar
+Confit de canard med potatis: 4 st ankklubbor, 800 g potatis, 2 st vitlöksklyftor, 2 msk anksmör, 1 tsk salt, 0.5 tsk svartpeppar
+Baba ghanoush med lammfärs: 500 g lammfärs, 2 st aubergine, 1 dl tahini, 1 st citron, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Kofta med tzatziki: 600 g lammfärs, 1 st gul lök, 2 msk spiskummin, 200 g tzatziki, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Shawarma med kyckling: 700 g kycklingfilé, 2 msk shawarmakrydda, 4 st pitabröd, 1 dl tahinisås, 1 tsk salt, 2 msk olivolja
+Harira: 400 g lammfärs, 400 g kikärtor, 800 g krossade tomater, 100 g linser, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Tabbouleh med halloumi: 200 g bulgur, 400 g halloumi, 2 dl persilja, 2 st tomat, 1 tsk salt, 0.5 tsk svartpeppar
+Baklava-inspirerad kycklinggryta med aprikos: 700 g kycklingfilé, 150 g torkade aprikoser, 2 msk honung, 1 msk kanel, 1 tsk salt, 2 msk smör
+Kibbeh: 500 g lammfärs, 200 g bulgur, 1 st gul lök, 1 msk kryddpeppar, 1 tsk salt, 2 msk olivolja
+Muhammara med grillad kyckling: 700 g kycklingfilé, 200 g valnötter, 2 st röd paprika, 1 msk granatäppelsirap, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olivolja
+Fattoush: 4 st pitabröd, 300 g tomat, 1 st gurka, 100 g rädisor, 1 dl sumak, 1 tsk salt
+Marockansk kycklingtagine: 700 g kycklingfilé, 150 g torkade aprikoser, 2 msk ras el hanout, 400 g krossade tomater, 1 tsk salt, 2 msk olja
+Lammgryta med couscous: 700 g lammbog, 300 g couscous, 400 g krossade tomater, 2 msk ras el hanout, 1 tsk salt, 2 msk olja
+Za'atarkyckling med citron: 700 g kycklingfilé, 2 msk za'atar, 1 st citron, 800 g potatis, 1 tsk salt, 2 msk olja
+Vietnamesisk nötsoppa pho: 600 g biff av nöt, 1 liter buljong, 300 g risnudlar, 1 dl koriander, 1 st lime, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Banh mi: 4 st baguetter, 400 g fläskytterfilé, 1 st morot, 1 st gurka, 2 msk sriracha, 1 tsk salt, 2 msk olja
+Vietnamesiska vårrullar med räkor: 300 g räkor, 12 st risbladspapper, 100 g risnudlar, 1 dl mynta
+Bun cha: 500 g fläskfärs, 300 g risnudlar, 1 dl fisksås, 1 st morot, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Donburi med kyckling och ägg: 600 g kycklingfilé, 4 st ägg, 300 g ris, 1 st gul lök, 3 msk soja, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Katsudon: 600 g fläskkotletter, 4 st ägg, 300 g ris, 2 dl ströbröd, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Okonomiyaki: 300 g vitkål, 3 dl vetemjöl, 3 st ägg, 150 g bacon, 2 msk okonomiyakisås, 1 tsk salt, 0.5 tsk svartpeppar
+Tempura räkor med ris: 500 g räkor, 2 dl vetemjöl, 2 dl iskallt vatten, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar
+Yaki udon med fläsk: 400 g udonnudlar, 400 g fläskytterfilé, 300 g wokgrönsaker, 3 msk soja, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Gyoza med fläsk: 400 g fläskfärs, 24 st gyozadegar, 2 st vårlök, 2 msk soja, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Kinesisk fläskgryta i fem kryddor: 700 g fläsksida, 3 msk soja, 1 msk fem-kryddpulver, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Mapo tofu: 400 g tofu, 300 g nötfärs, 2 msk chilibönpasta, 300 g ris, 1 tsk salt, 2 msk olja
+Chow mein: 400 g äggnudlar, 400 g kycklingfilé, 300 g wokgrönsaker, 3 msk soja, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+General Tsos kyckling: 600 g kycklingfilé, 3 msk soja, 2 msk honung, 1 msk chiliflakes, 300 g ris, 1 tsk salt, 2 msk olja
+Kinesisk ångad fisk: 700 g vit fisk, 3 msk soja, 1 msk ingefära, 2 st vårlök, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Sichuanfläsk: 600 g fläskytterfilé, 2 msk chilibönpasta, 1 st paprika, 300 g ris, 1 tsk salt, 2 msk olja
+Sydindisk fisk curry: 700 g vit fisk, 4 dl kokosmjölk, 2 msk currypulver, 1 st chili, 300 g ris, 1 tsk salt, 2 msk olja
+Chana masala: 400 g kikärtor, 400 g krossade tomater, 2 msk garam masala, 300 g ris, 1 tsk salt
+Aloo gobi: 600 g potatis, 1 st blomkålshuvud, 2 msk currypulver, 400 g krossade tomater, 1 tsk salt
+Keema curry: 500 g lammfärs, 400 g krossade tomater, 2 msk garam masala, 300 g ris, 1 tsk salt, 2 msk olja
+Rogan josh: 700 g lammbog, 400 g krossade tomater, 2 msk garam masala, 2 dl yoghurt, 1 tsk salt, 2 msk olja
+Vindaloo med fläsk: 700 g fläskytterfilé, 2 msk vindalookrydda, 400 g krossade tomater, 1 tsk salt, 2 msk olja
+Saag aloo: 600 g potatis, 400 g bladspenat, 2 msk currypulver, 2 dl yoghurt, 1 tsk salt
+Meatloaf amerikansk stil: 800 g nötfärs, 2 dl ströbröd, 2 st ägg, 2 dl ketchup, 800 g potatis, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Sloppy joe: 600 g nötfärs, 400 g krossade tomater, 1 st paprika, 4 st hamburgerbröd, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Mac and cheese: 400 g makaroner, 4 dl mjölk, 300 g riven cheddarost, 2 msk vetemjöl, 1 tsk salt, 0.5 tsk svartpeppar
+Buffalo chicken wings: 1 kg kycklingvingar, 1 dl hot sauce, 50 g smör, 100 g blue cheese-dressing, 1 tsk salt, 0.5 tsk svartpeppar
+Shepherd's pie: 600 g lammfärs, 800 g potatis, 2 st morot, 1 st gul lök, 2 dl mjölk, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Cottage pie: 600 g nötfärs, 800 g potatis, 2 st morot, 1 st gul lök, 2 dl mjölk, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Chicken pot pie: 600 g kycklingfilé, 1 st pajdeg, 300 g blandade grönsaker, 3 dl grädde, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Jambalaya: 500 g kycklingfilé, 300 g chorizo, 300 g räkor, 300 g ris, 400 g krossade tomater, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Gumbo: 500 g kycklingfilé, 300 g chorizo, 300 g okra, 1 liter buljong, 2 msk cajunkrydda, 1 tsk salt, 2 msk olja
+Clam chowder: 600 g musslor, 600 g potatis, 3 dl grädde, 100 g bacon, 1 tsk salt, 0.5 tsk svartpeppar
+New england fish stew: 600 g vit fisk, 600 g potatis, 3 dl grädde, 100 g bacon, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Cornbread med chili: 500 g nötfärs, 400 g krossade tomater, 400 g röda bönor, 2 dl majsmjöl, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Fried chicken med potatismos: 1 kg kycklinglår, 3 dl vetemjöl, 2 st ägg, 800 g potatis, 2 dl mjölk, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Beef stroganoff: 600 g biff av nöt, 400 g champinjoner, 3 dl gräddfil, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Lancashire hotpot: 700 g lammbog, 800 g potatis, 2 st gul lök, 3 st morot, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Bangers and mash: 8 st grillkorv, 800 g potatis, 2 dl mjölk, 2 dl lök-gravy, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Fish pie: 600 g vit fisk, 200 g räkor, 800 g potatis, 3 dl bechamelsås, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Toad in the hole: 8 st korv, 3 dl vetemjöl, 3 dl mjölk, 3 st ägg, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Grillad tonfisk med sesam: 600 g tonfisk, 3 msk soja, 2 msk sesamfrön, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Halstrad torsk med brynt smör: 700 g torskfilé, 100 g smör, 1 st citron, 800 g potatis, 1 tsk salt, 0.5 tsk svartpeppar
+Ugnsbakad hel fisk med citron: 1 st hel fisk (t.ex. havsabborre), 1 st citron, 2 kvistar rosmarin, 2 msk olivolja, 1 tsk salt, 0.5 tsk svartpeppar
+Skaldjurspasta: 400 g pasta, 400 g blandade skaldjur, 400 g krossade tomater, 2 st vitlöksklyftor, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Krabbkakor: 400 g krabbkött, 100 g ströbröd, 2 st ägg, 1 dl majonnäs, 1 tsk salt, 0.5 tsk svartpeppar
+Ceviche med lax: 500 g lax, 2 st lime, 1 st rödlök, 1 dl koriander
+Gravad lax med hovmästarsås: 700 g laxsida, 2 dl salt, 2 dl socker, 2 dl dill, 2 msk senap
+Fiskbullar i currysås: 500 g fiskfärs, 4 dl kokosmjölk, 2 msk currypasta, 300 g ris, 1 tsk salt, 2 msk olja
+Räkgryta med fänkål: 500 g räkor, 1 st fänkål, 400 g krossade tomater, 1 dl vitt vin, 1 tsk salt, 0.5 tsk svartpeppar
+Sillsallad: 400 g inlagd sill, 400 g potatis, 2 st rödbetor, 2 st äpple, 2 dl gräddfil
+Ugnsbakad torsk med parmesanskorpa: 700 g torskfilé, 100 g parmesan, 100 g ströbröd, 2 msk olja, 1 tsk salt, 0.5 tsk svartpeppar
+Vegansk chili sin carne: 400 g röda bönor, 400 g svarta bönor, 800 g krossade tomater, 1 st paprika, 1 tsk salt, 0.5 tsk svartpeppar
+Vegansk pad thai med tofu: 400 g rispasta, 300 g tofu, 2 dl böngroddar, 3 msk tamarindpasta, 1 tsk salt, 0.5 tsk svartpeppar
+Vegansk curry med kikärtor: 400 g kikärtor, 4 dl kokosmjölk, 2 msk currypasta, 300 g ris, 1 tsk salt
+Vegansk buddha bowl: 200 g quinoa, 200 g kikärtor, 1 st avokado, 200 g rostade grönsaker, 1 tsk salt, 0.5 tsk svartpeppar
+Vegansk lasagne med linser: 400 g gröna linser, 800 g krossade tomater, 12 st lasagneplattor, 400 g cashewsås, 1 tsk salt, 0.5 tsk svartpeppar
+Vegansk gryta med sötpotatis: 600 g sötpotatis, 400 g kikärtor, 4 dl kokosmjölk, 2 msk currypasta, 1 tsk salt
+Sojafärsbolognese: 400 g sojafärs, 800 g krossade tomater, 1 st gul lök, 400 g spaghetti, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk olja
+Vegansk korvgryta: 400 g vegokorv, 800 g krossade tomater, 1 st paprika, 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Stekt tofu med teriyakisås: 400 g tofu, 3 msk soja, 2 msk honung (utelämna för veganskt), 300 g ris, 1 tsk salt, 0.5 tsk svartpeppar
+Rostade grönsaker med tahinisås: 600 g blandade rotfrukter, 100 g tahini, 1 st citron, 1 tsk salt, 0.5 tsk svartpeppar
+Sötpotatisgryta med svarta bönor: 600 g sötpotatis, 400 g svarta bönor, 400 g krossade tomater, 1 msk spiskummin, 1 tsk salt, 0.5 tsk svartpeppar
+Zucchininudlar med pesto: 4 st zucchini, 150 g pesto, 100 g körsbärstomater, 50 g pinjenötter, 1 tsk salt, 0.5 tsk svartpeppar
+Grönsaksfrittata: 8 st ägg, 400 g blandade grönsaker, 100 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar
+Halloumigryta med linser: 400 g halloumi, 300 g röda linser, 400 g krossade tomater, 1 tsk salt, 0.5 tsk svartpeppar
+Aubergineplattor med tomatsås och parmesan (parmigiana): 3 st aubergine, 400 g krossade tomater, 200 g mozzarella, 100 g parmesan, 1 tsk salt, 0.5 tsk svartpeppar
+Vegetarisk pajskal med rotfrukter: 1 st pajdeg, 400 g rotfrukter, 3 st ägg, 2 dl grädde, 1 tsk salt, 0.5 tsk svartpeppar
+Renskavsgryta: 700 g renskav, 3 dl grädde, 1 st gul lök, 800 g potatismos, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Älgstek med rårörda lingon: 700 g älgstek, 2 dl rödvinssås, 800 g potatis, 1 tsk salt, 0.5 tsk svartpeppar
+Viltgryta: 700 g viltgrytbitar, 4 st kryddpepparkorn, 2 st lagerblad, 4 dl viltfond, 1 tsk salt
+Strömming med potatismos: 700 g strömmingsfiléer, 800 g potatis, 2 dl mjölk, 2 dl gräddfil, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Löjromstoast med rödlök: 200 g löjrom, 2 dl crème fraiche, 1 st rödlök
+Surströmmingsklämma: 1 burk surströmming, 8 st tunnbröd, 800 g potatis, 1 st rödlök
+Falukorvsgryta med curry: 500 g falukorv, 2 msk currypulver, 4 dl kokosmjölk, 300 g ris, 1 tsk salt, 2 msk olja
+Ugnspannkaka med lingon: 5 dl mjölk, 3 dl vetemjöl, 4 st ägg, 200 g fläsk, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Renskavs-wraps: 500 g renskav, 4 st tortillabröd, 2 dl gräddfil, 100 g rödkål, 1 tsk salt, 0.5 tsk svartpeppar
+Gubbröra på smörgås: 6 st ägg, 100 g ansjovisfilé, 1 st rödlök
+Toast Skagen: 400 g räkor, 2 dl majonnäs, 1 dl dill, 100 g löjrom
+15-minuters pasta med tonfisk: 400 g pasta, 300 g tonfisk, 400 g krossade tomater, 2 st vitlöksklyftor, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Snabbwok med räkor: 400 g räkor, 400 g wokgrönsaker, 3 msk soja, 300 g nudlar, 1 tsk salt, 0.5 tsk svartpeppar
+Omelett med rester: 8 st ägg, 200 g valfria rester, 100 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar
+Korv och stekt potatis: 6 st falukorv, 800 g potatis, 1 st gul lök, 2 msk senap, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Tonfiskgratäng: 300 g tonfisk, 400 g makaroner, 3 dl grädde, 100 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar, 2 msk smör
+Snabb currykyckling: 600 g kycklingfilé, 2 msk currypulver, 4 dl kokosmjölk, 300 g snabbris, 1 tsk salt, 2 msk olja
+Quesadillas med rester: 8 st tortillabröd, 300 g valfria rester, 200 g riven ost, 1 tsk salt, 0.5 tsk svartpeppar
+Snabb minestrone med pasta: 400 g krossade tomater, 200 g pasta, 400 g blandade grönsaker, 1 liter buljong, 1 tsk salt, 0.5 tsk svartpeppar
+Halloumisallad med couscous: 400 g halloumi, 300 g couscous, 200 g körsbärstomater, 1 dl olivolja, 1 tsk salt, 0.5 tsk svartpeppar`;
+  const DEFAULT_TAGS_TEXT = `Köttbullar med potatismos: nöt
+Kalops: nöt
+Pannbiff med lök: nöt
+Fläskkotletter med gräddsås: gris
+Korv stroganoff: gris
+Kåldolmar: nöt
+Janssons frestelse: fisk
+Raggmunk med fläsk: gris
+Pyttipanna: gris
+Isterband med rotmos: gris
+Rotmos med fläsklägg: gris
+Ärtsoppa med fläsk: gris
+Biff Rydberg: nöt
+Wallenbergare: nöt
+Blodpudding med lingon: gris
+Ugnspannkaka med bacon: gris
+Lax med potatismos och dillsås: fisk
+Kokt torsk med äggsås: fisk
+Fiskgratäng: fisk
+Kycklinggryta med curry: kyckling
+Kycklingfilé med citron och timjan: kyckling
+Sjömansbiff: nöt
+Fläskfilé med senapssås: gris
+Kalvfrikassé: nöt
+Kroppkakor: gris
+Grönkålssoppa med korv: gris
+Spaghetti bolognese: nöt
+Lasagne: nöt
+Carbonara: gris
+Pasta alla vongole: fisk
+Pasta pesto med kyckling: kyckling
+Pizza med skinka och champinjon: gris
+Calzone: gris
+Kycklingschnitzel milanese: kyckling
+Saltimbocca: nöt
+Osso buco: nöt
+Caprese-sallad med grillad kyckling: kyckling
+Tacos: nöt
+Tacogryta: nöt
+Fajitas med kyckling: kyckling
+Enchiladas: kyckling
+Chili con carne: nöt
+Quesadillas: kyckling
+Burritos: nöt
+Guacamole-tacos med räkor: fisk
+Ceviche: fisk
+Kycklingtikka masala: kyckling
+Butter chicken: kyckling
+Kycklingbiryani: kyckling
+Kycklingwok med grönsaker: kyckling
+Nötkött i oystersås: nöt
+Pad thai: fisk
+Kung pao chicken: kyckling
+Sötsur fläsk: gris
+Vårrullar: nöt
+Ramen med fläsk: gris
+Yakisoba: kyckling
+Teriyakilax: fisk
+Sushi med lax och avokado: fisk
+Miso soppa med tofu: vegetariskt
+Dumplings med fläsk: gris
+Bibimbap: nöt
+Koreansk kycklinggryta: kyckling
+Halloumigryta: vegetariskt
+Grekisk sallad med halloumi: vegetariskt
+Moussaka: nöt
+Souvlaki med tzatziki: gris
+Paella: fisk
+Tapasfat med kikärtor och chorizo: gris
+Fisksoppa: fisk
+Bouillabaisse: fisk
+Grillad lax med sparris: fisk
+Räkpasta med vitlök och chili: fisk
+Scampi: fisk
+Fish and chips: fisk
+Ugnsbakad torsk med rotfrukter: fisk
+Musslor i vitvinssås: fisk
+Bakad potatis med skagenröra: fisk
+Halstrad makrill med potatissallad: fisk
+Vegetarisk lasagne: vegetariskt
+Vegetarisk chili sin carne: vegetariskt
+Halloumiburgare: vegetariskt
+Vegetarisk wok: vegetariskt
+Quornbullar med potatismos: vegetariskt
+Vegetarisk paj med fetaost: vegetariskt
+Hamburgare med bacon: gris
+Cheeseburgare: nöt
+BBQ-revben: gris
+Pulled pork: gris
+Grillad kyckling med chimichurri: kyckling
+Grillspett med fläsk: gris
+Entrecote med bearnaisesås: nöt
+Grillad halloumi med couscous: vegetariskt
+Pulled chicken tacos: kyckling
+Korv med bröd: gris
+Grillad lax med citron och rosmarin: fisk
+Hasselbackspotatis med fläskfilé: gris
+Kycklinggratäng: kyckling
+Pyttig fisk med kapris: fisk
+Kalkonschnitzel: kyckling
+Fläskytterfilé med äppelsås: gris
+Kycklingsallad med avokado: kyckling
+Tonfisksallad: fisk
+Kycklingsoppa med nudlar: kyckling
+Köttfärslimpa: nöt
+Sockerärtor med kyckling och sesam: kyckling
+Fläskfilé i ugn med rotfrukter: gris
+Krämig svampsås med biff: nöt
+Kalvsteak med potatisgratäng: nöt
+Kycklingsoppa med grönsaker: kyckling
+Fisksoppa thailändsk stil: fisk
+Nudelsoppa med kyckling: kyckling
+Gulaschsoppa: nöt
+Linssoppa med korv: gris
+Kimchisoppa med tofu: vegetariskt
+Kycklingsallad med curry och äpple: kyckling
+Räksallad med avokado: fisk
+Pastasallad med kyckling: kyckling
+Nicoisesallad: fisk
+Rostbiffsallad: nöt
+Räkmacka: fisk
+Club sandwich: gris
+Halloumiwrap: vegetariskt
+Kycklingwrap med bbq: kyckling
+Gyros i pitabröd: gris
+Boeuf bourguignon: gris
+Coq au vin: gris
+Ratatouillegryta med korv: gris
+Gulasch wienerstil: nöt
+Wienerschnitzel: nöt
+Sauerbraten: nöt
+Schweizer rösti med bacon: gris
+Gemüseeintopf: gris
+Provencalsk kycklinggryta: kyckling
+Cassoulet: gris
+Quiche lorraine: gris
+Croque madame: gris
+Shawarma med kyckling: kyckling
+Tabbouleh med halloumi: vegetariskt
+Baklava-inspirerad kycklinggryta med aprikos: kyckling
+Muhammara med grillad kyckling: kyckling
+Marockansk kycklingtagine: kyckling
+Za'atarkyckling med citron: kyckling
+Vietnamesisk nötsoppa pho: nöt
+Banh mi: gris
+Vietnamesiska vårrullar med räkor: fisk
+Bun cha: fisk
+Donburi med kyckling och ägg: kyckling
+Katsudon: gris
+Okonomiyaki: gris
+Tempura räkor med ris: fisk
+Yaki udon med fläsk: gris
+Gyoza med fläsk: gris
+Kinesisk fläskgryta i fem kryddor: gris
+Mapo tofu: nöt
+Chow mein: kyckling
+General Tsos kyckling: kyckling
+Kinesisk ångad fisk: fisk
+Sichuanfläsk: gris
+Sydindisk fisk curry: fisk
+Vindaloo med fläsk: gris
+Meatloaf amerikansk stil: nöt
+Sloppy joe: nöt
+Buffalo chicken wings: kyckling
+Cottage pie: nöt
+Chicken pot pie: kyckling
+Jambalaya: fisk
+Gumbo: gris
+Clam chowder: fisk
+New england fish stew: fisk
+Cornbread med chili: nöt
+Fried chicken med potatismos: kyckling
+Beef stroganoff: nöt
+Fish pie: fisk
+Toad in the hole: gris
+Grillad tonfisk med sesam: fisk
+Halstrad torsk med brynt smör: fisk
+Ugnsbakad hel fisk med citron: fisk
+Ceviche med lax: fisk
+Gravad lax med hovmästarsås: fisk
+Fiskbullar i currysås: fisk
+Räkgryta med fänkål: fisk
+Sillsallad: fisk
+Ugnsbakad torsk med parmesanskorpa: fisk
+Vegansk chili sin carne: vegetariskt
+Vegansk pad thai med tofu: vegetariskt
+Vegansk curry med kikärtor: vegetariskt
+Vegansk buddha bowl: vegetariskt
+Vegansk lasagne med linser: vegetariskt
+Vegansk gryta med sötpotatis: vegetariskt
+Vegansk korvgryta: gris
+Stekt tofu med teriyakisås: vegetariskt
+Halloumigryta med linser: vegetariskt
+Vegetarisk pajskal med rotfrukter: vegetariskt
+Strömming med potatismos: fisk
+Falukorvsgryta med curry: gris
+Ugnspannkaka med lingon: gris
+Gubbröra på smörgås: fisk
+Toast Skagen: fisk
+15-minuters pasta med tonfisk: fisk
+Snabbwok med räkor: fisk
+Korv och stekt potatis: gris
+Tonfiskgratäng: fisk
+Snabb currykyckling: kyckling
+Halloumisallad med couscous: vegetariskt
+Plättar med lingon: vegetariskt
+Karelska piroger med äggsmör: vegetariskt
+Löksoppa med ost: vegetariskt
+Pasta arrabbiata: vegetariskt
+Risotto med svamp: vegetariskt
+Pizza margherita: vegetariskt
+Minestrone: vegetariskt
+Dahl med linser: vegetariskt
+Grönsakscurry: vegetariskt
+Palak paneer: vegetariskt
+Naanbröd med linsgryta: vegetariskt
+Falafel med hummus: vegetariskt
+Ratatouille: vegetariskt
+Spansk tortilla: vegetariskt
+Kikärtsgryta med spenat: vegetariskt
+Linsbolognese: vegetariskt
+Grönsaksbiffar: vegetariskt
+Zucchinilasagne: vegetariskt
+Svampgryta med kokosmjölk: vegetariskt
+Linssoppa: vegetariskt
+Blomkålscurry: vegetariskt
+Tomatsoppa med basilika: vegetariskt
+Broccolisoppa: vegetariskt
+Pumpasoppa: vegetariskt
+Morotssoppa med ingefära: vegetariskt
+Potatis- och purjolökssoppa: vegetariskt
+Svampsoppa: vegetariskt
+Fransk löksoppa: vegetariskt
+Quinoasallad med fetaost: vegetariskt
+Falafelwrap: vegetariskt
+Bönröra med rostat bröd: vegetariskt
+Getostmacka med honung: vegetariskt
+Kartoffelpuffer med äppelmos: vegetariskt
+Fattoush: vegetariskt
+Chana masala: vegetariskt
+Aloo gobi: vegetariskt
+Saag aloo: vegetariskt
+Mac and cheese: vegetariskt
+Sojafärsbolognese: vegetariskt
+Rostade grönsaker med tahinisås: vegetariskt
+Sötpotatisgryta med svarta bönor: vegetariskt
+Zucchininudlar med pesto: vegetariskt
+Grönsaksfrittata: vegetariskt
+Aubergineplattor med tomatsås och parmesan (parmigiana): vegetariskt
+Snabb minestrone med pasta: vegetariskt
+Flankstek med chimichurri: nöt
+Currywurst: gris
+Bangers and mash: gris
+Skaldjurspasta: fisk
+Krabbkakor: fisk
+Löjromstoast med rödlök: fisk
+Surströmmingsklämma: fisk
+Baba ghanoush med lammfärs: övrigt kött
+Confit de canard med potatis: övrigt kött
+Harira: övrigt kött
+Keema curry: övrigt kött
+Kibbeh: övrigt kött
+Kofta med tzatziki: övrigt kött
+Lammgryta med couscous: övrigt kött
+Lancashire hotpot: övrigt kött
+Omelett med rester: övrigt kött
+Quesadillas med rester: övrigt kött
+Renskavs-wraps: övrigt kött
+Renskavsgryta: övrigt kött
+Rogan josh: övrigt kött
+Shepherd's pie: övrigt kött
+Viltgryta: övrigt kött
+Älgstek med rårörda lingon: övrigt kött`;
+  const DEFAULT_RECIPES_TEXT = `=== Köttbullar med potatismos ===
+1. Riv eller finhacka löken. Blanda ströbröd och mjölk i en skål och låt svälla 5 minuter.
+2. Blanda köttfärs, ägg, den svällda ströbrödsblandningen, lök, salt och peppar. Arbeta smeten smidig med en gaffel eller händerna.
+3. Forma smeten till köttbullar med våta händer, ungefär lagom stora för en tugga.
+4. Hetta upp smör i en stekpanna på medelvärme. Stek köttbullarna i omgångar, rulla runt dem så de bryns jämnt, cirka 8–10 minuter tills de är genomstekta.
+5. Under tiden: skala och koka potatisen mjuk i lättsaltat vatten, cirka 20 minuter. Häll av vattnet.
+6. Mosa potatisen, tillsätt mjölk och smör lite i taget och rör till en jämn mos. Smaka av med salt.
+7. Servera köttbullarna med potatismoset, gärna med lingonsylt och pressgurka vid sidan om.
+
+=== Kalops ===
+1. Skär eventuellt grytbitarna lite mindre om de är stora. Skala och dela löken i klyftor, skala morötterna och skär i bitar.
+2. Vänd köttet i vetemjölet.
+3. Bryn köttet i omgångar i smör i en gryta på hög värme tills det fått fin färg. Ta upp och lägg åt sidan.
+4. Bryn löken i samma gryta ett par minuter.
+5. Lägg tillbaka köttet, tillsätt morötter, kryddpepparkorn, lagerblad, buljong, salt och vatten. Vattnet ska nästan täcka innehållet.
+6. Låt sjuda under lock på svag värme i 2–2,5 timmar, tills köttet är mört. Rör om då och då och fyll på lite vatten om det kokar in för mycket.
+7. Smaka av med mer salt om det behövs. Ta bort lagerbladen före servering.
+8. Koka potatisen mjuk i lättsaltat vatten under tiden. Servera kalopsen med kokt potatis och gärna lingonsylt.
+
+=== Pannbiff med lök ===
+1. Blanda ströbröd och mjölk, låt svälla 5 minuter.
+2. Blanda nötfärs, ägg, den svällda smeten, salt och peppar. Arbeta ihop till en jämn smet.
+3. Skala löken och skär i tunna ringar eller halvmånar.
+4. Fräs löken i en msk smör på medelvärme tills den är mjuk och gyllene, cirka 8 minuter. Ta upp och ställ åt sidan.
+5. Forma färsen till fyra platta biffar.
+6. Stek biffarna i resten av smöret, 3–4 minuter per sida, tills de är genomstekta.
+7. Koka potatisen mjuk i lättsaltat vatten under tiden, häll av vattnet och tillsätt mjölk, mosa lätt eller servera hela.
+8. Lägg löken ovanpå biffarna och servera med potatisen.
+
+=== Kåldolmar ===
+1. Ta bort de yttre grova bladen på vitkålen. Koka upp lättsaltat vatten i en stor gryta och lägg i kålhuvudet, koka 5–8 minuter tills bladen mjuknar och går lätt att lossa. Lossa bladen försiktigt allt eftersom, ett i taget, och låt dem svalna. Skär bort den grova mittnerven på varje blad.
+2. Koka riset enligt paketets anvisningar och låt svalna något.
+3. Blanda köttfärs, kokt ris, ägg, mjölk, salt och peppar till en jämn smet.
+4. Lägg en klick färs på varje kålblad, vik in kanterna och rulla ihop till ett paket.
+5. Bryn kåldolmarna runt om i smör i en stekpanna, lägg dem sedan i en ugnsform.
+6. Ringla över lönnsirap och häll på lite vatten i botten av formen.
+7. Grädda i ugn, 175 grader, cirka 30–40 minuter tills de är genomstekta.
+8. Koka potatisen under tiden. Servera kåldolmarna med kokt potatis, sky och gärna lingonsylt.
+
+=== Lasagne ===
+1. Skala och finhacka löken och vitlöken.
+2. Fräs löken och vitlöken i en gryta med lite olja tills löken blir mjuk.
+3. Lägg i nötfärsen och stek den gyllenbrun, bryt sönder klumpar med en slev.
+4. Tillsätt krossade tomater och salt. Låt såsen sjuda på svag värme i minst 20 minuter, gärna längre, rör om ibland.
+5. Sätt ugnen på 200 grader.
+6. Varva köttfärssås, lasagneplattor och bechamelsås i en ugnsform, börja och sluta med sås. Avsluta med ett lager bechamelsås och strö över den rivna osten.
+7. Grädda i mitten av ugnen i 35–40 minuter, tills plattorna är mjuka och ytan gyllenbrun.
+8. Låt lasagnen vila 5–10 minuter innan du skär upp den, då håller bitarna bättre ihop.
+
+=== Tacos ===
+1. Fräs nötfärsen i olja i en stekpanna på hög värme tills den är genomstekt och fått fin färg.
+2. Rör ner tacokryddan och salt, tillsätt lite vatten enligt anvisningen på kryddpåsen och låt puttra ihop några minuter.
+3. Skär tomaterna i tärningar och strimla isbergssalladen under tiden.
+4. Värm tortillabröden hastigt i en torr stekpanna eller i ugnen, några sekunder per sida.
+5. Riv osten.
+6. Duka fram färsen, tortillabröden, osten, tomat och sallad så alla kan bygga sina egna tacos.
+
+=== Kycklingtikka masala ===
+1. Skär kycklingfiléerna i bitar.
+2. Bryn kycklingbitarna i olja i en stekpanna eller gryta på hög värme tills de fått lite färg.
+3. Rör i garam masala och salt, låt kryddorna fräsa med en minut så aromerna vaknar.
+4. Häll i de krossade tomaterna, låt sjuda på svag värme i 10 minuter under lock.
+5. Rör ner grädden och låt såsen sjuda ytterligare 10 minuter, tills kycklingen är helt genomstekt och såsen tjocknat något.
+6. Koka riset enligt paketets anvisningar under tiden.
+7. Smaka av såsen med mer salt om det behövs. Servera med riset.
+
+=== Pad thai ===
+1. Blötlägg rispastan i kallt eller ljummet vatten enligt paketets anvisningar, tills den är mjuk men fortfarande lite tuggmotstånd (al dente). Häll av.
+2. Vispa ihop äggen i en skål.
+3. Hetta upp en wok eller stor stekpanna på hög värme. Stek räkorna hastigt tills de precis blivit rosa, ta upp och ställ åt sidan.
+4. Häll äggen i samma panna och rör om snabbt tills de stelnat till små bitar, för dem åt sidan i pannan.
+5. Lägg i den avrunna rispastan, tamarindpasta och salt. Vänd runt så pastan blandas jämnt med äggen.
+6. Lägg tillbaka räkorna och tillsätt böngroddarna, vänd runt ytterligare någon minut tills allt är varmt.
+7. Smaka av med mer tamarindpasta eller salt om det behövs. Servera direkt.
+
+=== Fisksoppa ===
+1. Skölj fisken och skär i bitar. Skölj räkorna om de är råa.
+2. Skiva fänkålen tunt.
+3. Fräs fänkålen i smör i en gryta på medelvärme tills den mjuknat, 5 minuter.
+4. Häll i de krossade tomaterna och låt puttra 10 minuter.
+5. Tillsätt grädde, salt och peppar, låt sjuda upp.
+6. Lägg i fiskbitarna och låt sjuda försiktigt på svag värme i 5–6 minuter, tills fisken precis är genomstekt (rör inte om för hårt, då faller den sönder).
+7. Lägg i räkorna sista minuten, bara tills de blir varma.
+8. Smaka av och servera direkt, gärna med bröd vid sidan om.
+
+=== Vegetarisk chili sin carne ===
+1. Skölj och häll av de röda och svarta bönorna.
+2. Skär paprikan i mindre bitar.
+3. Häll de krossade tomaterna i en gryta, tillsätt bönorna, paprikan, salt och peppar.
+4. Låt allt sjuda på svag till medelvärme i 20–25 minuter under lock, rör om då och då, tills paprikan är mjuk och smakerna gått ihop.
+5. Smaka av, tillsätt eventuellt mer salt eller lite chilipulver om du vill ha den starkare.
+6. Servera med ris, gräddfil eller majsbröd, precis som du föredrar.`;
+
+
   let dishes = [];       // [{name, ingredients: [{amount, unit, name}]}]
   let candidates = [];   // array of dish names currently drawn
   let selected = [];     // array of dish names currently checked
@@ -679,8 +1322,35 @@
     render();
   }
 
+  function buildDefaultDishes() {
+    const list = DEFAULT_DISHES_TEXT.split('\n').map(function(s) { return s.trim(); }).filter(Boolean).map(parseDishLine);
+    const tagged = parseTagsBulkText(DEFAULT_TAGS_TEXT);
+    tagged.forEach(function(item) {
+      const d = list.find(function(x) { return x.name.toLowerCase() === item.name.toLowerCase(); });
+      if (d) d.tags = item.tags;
+    });
+    const recipes = parseRecipeBulkText(DEFAULT_RECIPES_TEXT);
+    recipes.forEach(function(item) {
+      const d = list.find(function(x) { return x.name.toLowerCase() === item.name.toLowerCase(); });
+      if (d) d.recipe = item.recipe;
+    });
+    return list;
+  }
+
   async function loadState() {
-    try { const d = await storage.get('dishes'); dishes = d ? normalizeDishes(JSON.parse(d.value)) : []; } catch (e) { dishes = []; }
+    // Första gången appen öppnas på en enhet finns inget sparat under 'dishes' alls
+    // (storage.get returnerar null, skiljer sig från en tömd/sparad tom lista).
+    // Just då fylls listan med startdata — rätter, taggar och några exempelrecept —
+    // så appen inte känns helt tom. Händer bara den allra första gången.
+    try {
+      const d = await storage.get('dishes');
+      if (d) {
+        dishes = normalizeDishes(JSON.parse(d.value));
+      } else {
+        dishes = buildDefaultDishes();
+        try { await storage.set('dishes', JSON.stringify(dishes)); } catch (e) { /* best effort */ }
+      }
+    } catch (e) { dishes = []; }
     try { const c = await storage.get('candidates'); candidates = c ? JSON.parse(c.value) : []; } catch (e) { candidates = []; }
     try { const s = await storage.get('selected'); selected = s ? JSON.parse(s.value) : []; } catch (e) { selected = []; }
     try {
