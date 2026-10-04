@@ -1,5 +1,5 @@
-const CACHE_NAME = 'middagslotteriet-v1';
-const urlsToCache = ['./', './index.html'];
+const CACHE_NAME = 'middagslotteriet-v2';
+const urlsToCache = ['./', './index.html', './app.html', './manual.html'];
 
 self.addEventListener('install', function (event) {
   event.waitUntil(

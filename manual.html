@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Middagslotteriet — manual</title>
+<meta name="theme-color" content="#a6432c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8ecea;
+    --card: #fffbfa;
+    --card-line: #e8d3ce;
+    --chalk: #3a2429;
+    --chalk-dim: #8a6d6a;
+    --mustard: #c6883c;
+    --sage: #a15c6b;
+    --rust: #a6432c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--chalk);
+    font-family: 'Work Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 32px 20px 70px; }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    margin: 0 0 4px;
+    color: var(--rust);
+  }
+  .back { font-size: 0.95rem; }
+  .back a { color: var(--sage); text-decoration: none; }
+  .toc {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 18px 22px;
+    margin: 24px 0 32px;
+  }
+  .toc h2 { font-size: 1rem; margin: 0 0 10px; color: var(--chalk-dim); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .toc ol { margin: 0; padding-left: 20px; }
+  .toc a { color: var(--chalk); text-decoration: none; }
+  .toc a:hover { color: var(--rust); }
+  section {
+    background: var(--card);
+    border: 1px solid var(--card-line);
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 18px;
+  }
+  section h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.3rem;
+    margin: 0 0 10px;
+    color: var(--rust);
+  }
+  section p, section li { line-height: 1.6; }
+  section ul, section ol { padding-left: 22px; margin: 10px 0; }
+  code {
+    background: #f3e4de;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+  }
+  .tip {
+    background: #fdeeea;
+    border-left: 3px solid var(--mustard);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="back"><a href="index.html">← Till startsidan</a> &middot; <a href="app.html">Öppna appen</a></div>
+  <h1>Manual</h1>
+  <p>Så fungerar Middagslotteriet, steg för steg.</p>
+
+  <div class="toc">
+    <h2>Innehåll</h2>
+    <ol>
+      <li><a href="#rätter">Skriva in rätter</a></li>
+      <li><a href="#lotta">Lotta och välja</a></li>
+      <li><a href="#dagar">Planera dagar</a></li>
+      <li><a href="#favoriter">Favoriter</a></li>
+      <li><a href="#taggar">Taggar och filter</a></li>
+      <li><a href="#recept">Recept</a></li>
+      <li><a href="#inkop">Inköpslista</a></li>
+      <li><a href="#bulk">Bulk-import</a></li>
+      <li><a href="#data">Exportera och säkerhetskopiera</a></li>
+      <li><a href="#installera">Installera som app</a></li>
+    </ol>
+  </div>
+
+  <section id="rätter">
+    <h2>Skriva in rätter</h2>
+    <p>Tryck på <strong>"Skriv in rätter"</strong> (eller "Redigera lista" när listan inte är tom). Där kan du skriva in rätter en och en med namn, ingredienser, taggar och recept — eller klistra in flera på en gång under <strong>"Redigera hela listan som text"</strong>, ett format per rad:</p>
+    <p><code>Rättnamn: 500 g köttfärs, 1 st lök, 1 tsk salt</code></p>
+    <p>Ingredienser är valfria men gör inköpslistan mycket mer användbar — appen räknar automatiskt ihop mängder mellan rätter, även i olika enheter (g/kg, ml/cl/dl/l, tsk/msk).</p>
+    <div class="tip">Börja raden med ★ för att markera en rätt som favorit direkt när du skriver in den.</div>
+  </section>
+
+  <section id="lotta">
+    <h2>Lotta och välja</h2>
+    <p>Tryck på lottningsknappen för att dra fram ett antal slumpade rätter. Favoriter dras oftare (du styr hur mycket). Tryck på en dragen rätt:</p>
+    <ul>
+      <li><strong>1 tryck</strong> = välj den (1 gång)</li>
+      <li><strong>2 tryck</strong> = välj den igen (2 dagar i rad)</li>
+      <li><strong>3 tryck</strong> = ångra, välj bort den</li>
+    </ul>
+    <p>Gillar du inte lottningen kan du lotta om, eller söka upp och lägga till en specifik rätt manuellt istället.</p>
+  </section>
+
+  <section id="dagar">
+    <h2>Planera dagar</h2>
+    <p>När en rätt är vald kan du välja vilken veckodag den ska ligga på i en rullista. Varje dag har plats för två måltider ("Middag" och "Middag 2"). Rätter utan fast dag — t.ex. lunchrester — läggs under <strong>"Extra"</strong>.</p>
+  </section>
+
+  <section id="favoriter">
+    <h2>Favoriter</h2>
+    <p>Markera en rätt som favorit (★) i "Redigera lista" eller direkt i lottningslistan. Favoriter viktas så de dras oftare — du styr själv hur mycket oftare (2–10 gånger) via inställningen för favoritvikt.</p>
+  </section>
+
+  <section id="taggar">
+    <h2>Taggar och filter</h2>
+    <p>Varje rätt kan ha en kategori: vegetariskt, gris, nöt, kyckling, fisk eller övrigt kött. Sätt taggen när du skriver in eller redigerar en rätt.</p>
+    <p>Tryck på <strong>"🔎 Filtrera"</strong> för att välja bort kategorier du inte vill ha med i lottningen just nu — t.ex. om du vill ha en helt fiskfri vecka, kryssa bort "fisk". Filtret är bara ett val-bort, det går inte att välja "bara" en kategori.</p>
+  </section>
+
+  <section id="recept">
+    <h2>Recept</h2>
+    <p>Varje rätt kan ha ett eget recept — antingen en länk till ett recept någon annanstans, eller hela gör-så-här-texten skriven direkt i appen. Tryck på "📖 Recept" på en rätt för att se eller lägga till det.</p>
+  </section>
+
+  <section id="inkop">
+    <h2>Inköpslista</h2>
+    <p>När du har valt dagarnas rätter räknar appen automatiskt ihop alla ingredienser till en enda inköpslista, med mängder slagna ihop över rätter och enheter. Du kan:</p>
+    <ul>
+      <li>Kryssa av varor du redan har hemma</li>
+      <li>Lägga till egna extra-varor (t.ex. "tandkräm") som inte hör till någon rätt</li>
+      <li>Dela listan via WhatsApp, kopiera den som text, eller skriva ut den</li>
+    </ul>
+  </section>
+
+  <section id="bulk">
+    <h2>Bulk-import</h2>
+    <p>Under "Redigera lista" finns tre rutor för att klistra in mycket på en gång istället för att skriva allt för hand:</p>
+    <ul>
+      <li><strong>Redigera hela listan som text</strong> — hela rättlistan med ingredienser, en rätt per rad</li>
+      <li><strong>Importera recept i bulk</strong> — flera hela recept på en gång, i block med <code>=== Rättnamn ===</code></li>
+      <li><strong>Importera taggar i bulk</strong> — en rad per rätt: <code>Rättnamn: tagg</code></li>
+    </ul>
+    <div class="tip">Rätterna måste finnas i listan innan recept eller taggar kan matchas mot dem — gör alltid rätt-importen först.</div>
+  </section>
+
+  <section id="data">
+    <h2>Exportera och säkerhetskopiera</h2>
+    <p>Appen sparar allt lokalt på just den telefonen/webbläsaren du använder — ingen molnsynk, inget konto. Det betyder att data <strong>inte</strong> delas mellan t.ex. din iPhone och din Android-telefon, och att den kan försvinna om du rensar webbläsarens data. Använd exportfunktionen i "Redigera lista" för att säkerhetskopiera listan som text ibland.</p>
+  </section>
+
+  <section id="installera">
+    <h2>Installera som app</h2>
+    <p>Gå till <a href="index.html">startsidan</a> och välj din telefontyp för installationssteg. Android kan installeras med ett tryck; iPhone kräver några manuella tryck i Safari (Apple tillåter inte automatisk installation från webben).</p>
+  </section>
+</div>
+</body>
+</html>
