@@ -2237,6 +2237,12 @@ Viltgryta: övrigt kött
     if (!loaded) { root.innerHTML = '<div class="loading">Laddar din middagslista...</div>'; return; }
 
     let html = '<div class="wrap">';
+    // TILLFÄLLIG PLATSHÅLLARE — bara för att se hur layouten känns med en annons
+    // högst upp. Ingen riktig annons laddas, bara en gråmarkerad ruta i ungefärlig
+    // storlek (320x50, en vanlig mobilbanner). Ta bort denna block när ni är klara
+    // med att testa känslan, eller byt ut mot riktig annonskod (t.ex. AdSense) när
+    // kontot är godkänt.
+    html += '<div style="max-width:320px; height:50px; margin:0 auto 14px; background:#e8d3ce; border:1px dashed var(--chalk-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--chalk-dim); font-size:0.8rem;">Annons (platshållare, 320×50)</div>';
     html += '<div style="display:flex; align-items:baseline; justify-content:center; gap:10px; flex-wrap:wrap;"><h1 style="margin-bottom:0;">Middagslotteriet</h1><a href="manual.html" class="link-btn" style="font-size:0.85rem;">Hjälp / manual</a></div>';
     html += '<p class="subtitle">Lotta upp till 20, välj de du vill ha, få en inköpslista</p>';
     html += '<div class="board">';
