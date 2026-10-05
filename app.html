@@ -1269,7 +1269,9 @@ Viltgryta: övrigt kött
 
   function exportDishes() {
     if (dishes.length === 0) { statusMsg = 'Inget att exportera — listan är tom.'; render(); return; }
-    const text = dishesToText();
+    // En UTF-8 BOM i början gör att å/ä/ö visas rätt även i appar som annars
+    // gissar fel teckenkodning när de öppnar .txt-filer (vanligt på mobilen).
+    const text = '﻿' + dishesToText();
     const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1282,6 +1284,66 @@ Viltgryta: övrigt kött
     URL.revokeObjectURL(url);
     statusMsg = 'Backup nedladdad — ' + dishes.length + ' rätter.';
     render();
+  }
+
+  // Allt-i-ett-backup: alla lagrade nycklar i en enda JSON-fil, så man kan
+  // flytta hela appens innehåll (rätter, planering, inköpslista, inställningar)
+  // till en annan telefon eller dator genom att skicka över en fil.
+  const ALL_STORAGE_KEYS = [
+    'dishes', 'candidates', 'selected', 'staples', 'extraItems', 'shopChecked',
+    'drawCount', 'baseServings', 'planAssignments', 'rejected',
+    'favoriteWeight', 'excludedCategories'
+  ];
+
+  async function exportAllData() {
+    const payload = { __middagslotteriet_backup: true, version: 1, exportedAt: new Date().toISOString(), data: {} };
+    for (const key of ALL_STORAGE_KEYS) {
+      const v = await storage.get(key);
+      if (v !== null) payload.data[key] = v.value;
+    }
+    const text = JSON.stringify(payload, null, 2);
+    const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = 'middagslotteriet_allt_' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    statusMsg = 'Allt exporterat (' + dishes.length + ' rätter + planering + inställningar). Skicka filen till din andra enhet och importera den där.';
+    render();
+  }
+
+  function triggerImportAll() {
+    const input = document.getElementById('importAllFileInput');
+    if (input) input.click();
+  }
+
+  function importAllFile(fileInput) {
+    const file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        if (!parsed || typeof parsed.data !== 'object') throw new Error('filen verkar inte vara en giltig Middagslotteriet-backup.');
+        const ok = confirm('Detta skriver över ALLT som finns i appen just nu på den här enheten — rätter, planering, inköpslista och inställningar — med innehållet i filen "' + file.name + '". Går inte att ångra. Vill du fortsätta?');
+        if (!ok) { fileInput.value = ''; return; }
+        for (const key of Object.keys(parsed.data)) {
+          await storage.set(key, parsed.data[key]);
+        }
+        await loadState();
+        statusMsg = 'Allt importerat från backup — ' + dishes.length + ' rätter, planering och inställningar återställda.';
+        render();
+      } catch (err) {
+        statusMsg = 'Kunde inte importera filen: ' + (err && err.message ? err.message : 'okänt fel');
+        render();
+      }
+      fileInput.value = '';
+    };
+    reader.readAsText(file);
   }
 
   function requestClearAll() {
@@ -2574,7 +2636,14 @@ Viltgryta: övrigt kött
       if (tagImportMsg) html += '<div class="status-msg" style="margin-top:8px;">' + escapeHtml(tagImportMsg) + '</div>';
 
       html += '<hr class="divider">';
-      html += '<button class="link-btn" style="display:block; margin-bottom:12px;" onclick="exportDishes()">⬇ Exportera lista som backup (.txt)</button>';
+      html += '<h2 style="margin-top:0;">Flytta till en annan telefon eller dator</h2>';
+      html += '<div class="hint">Exportera ALLT — rätter, veckoplanering, inköpslista och inställningar — som en enda fil. Skicka filen till dig själv (t.ex. via mail, WhatsApp eller molnlagring) och importera den på den andra enheten. Appen sparar bara lokalt, så det här är det enda sättet att flytta med sig allt.</div>';
+      html += '<button class="save-btn" style="margin-top:10px;" onclick="exportAllData()">⬇ Exportera ALLT (.json)</button>';
+      html += '<button class="link-btn" style="display:block; margin-top:10px;" onclick="triggerImportAll()">⬆ Importera allt från backup-fil</button>';
+      html += '<input type="file" id="importAllFileInput" accept="application/json,.json" style="display:none;" onchange="importAllFile(this)">';
+
+      html += '<hr class="divider">';
+      html += '<button class="link-btn" style="display:block; margin-bottom:12px;" onclick="exportDishes()">⬇ Exportera bara rättlistan som text (.txt)</button>';
 
       if (!confirmClear) {
         html += '<button class="reset-btn" style="margin-left:0;" onclick="requestClearAll()">Töm hela listan (' + dishes.length + ' rätter)</button>';
@@ -2777,6 +2846,9 @@ Viltgryta: övrigt kött
   window.handleRemove = handleRemove;
   window.handleSearch = handleSearch;
   window.exportDishes = exportDishes;
+  window.exportAllData = exportAllData;
+  window.triggerImportAll = triggerImportAll;
+  window.importAllFile = importAllFile;
   window.requestClearAll = requestClearAll;
   window.cancelClearAll = cancelClearAll;
   window.updateClearConfirmText = updateClearConfirmText;
