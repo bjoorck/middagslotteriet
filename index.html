@@ -131,10 +131,11 @@
     <div class="picker">
       <button id="btnAndroid" onclick="selectPlatform('android')">🤖 Android</button>
       <button id="btnIphone" onclick="selectPlatform('iphone')">📱 iPhone</button>
+      <button id="btnWindows" onclick="selectPlatform('windows')">🖥️ Dator</button>
     </div>
 
     <div id="panelAndroid" class="platform-panel">
-      <button id="installBtn" class="install-btn" onclick="installAndroid()" disabled>Installera appen</button>
+      <button id="installBtn" class="install-btn" onclick="installApp()" disabled>Installera appen</button>
       <div id="androidFallback" class="fallback-note" style="display:none;">
         Din webbläsare stödjer inte direktinstallation just nu, eller sidan har inte laddats klart än. Gör det manuellt istället:
         <ol class="steps">
@@ -160,6 +161,22 @@
         <strong>Hittar du inte appen efteråt?</strong> Den läggs direkt på <strong>hemskärmen</strong> (ofta sist, efter dina andra appar) — bläddra åt sidan genom dina hemskärmar tills du ser ikonen. Du kan sedan hålla fingret nedtryckt på den och dra den till valfri plats.
       </div>
     </div>
+
+    <div id="panelWindows" class="platform-panel">
+      <div class="badge">Fungerar i Chrome, Edge och andra Chromium-baserade webbläsare</div>
+      <button id="installBtnWindows" class="install-btn" onclick="installApp()" disabled>Installera appen</button>
+      <div id="windowsFallback" class="fallback-note" style="display:none;">
+        Knappen funkar inte just nu, eller webbläsaren stödjer inte direktinstallation. Gör det manuellt istället:
+        <ol class="steps">
+          <li>Leta efter en liten installationsikon (⊕ eller en skärm med en pil) längst till höger i adressfältet — klicka på den.</li>
+          <li>Har du ingen sådan ikon: klicka på de tre punkterna (⋮) eller tre strecken (≡) uppe till höger, och välj <strong>"Installera Middagslotteriet…"</strong> eller <strong>"Appar" → "Installera den här webbplatsen som en app"</strong>.</li>
+          <li>Bekräfta i rutan som dyker upp. Klart!</li>
+        </ol>
+      </div>
+      <div class="fallback-note">
+        <strong>Var hamnar appen?</strong> Den läggs till i Start-menyn (Windows) och ofta även som en genväg på skrivbordet eller i aktivitetsfältet, precis som ett vanligt program. Den öppnas i sitt eget fönster, utan webbläsarens adressfält.
+      </div>
+    </div>
   </div>
 
   <div class="links">
@@ -171,8 +188,10 @@
   function selectPlatform(p) {
     document.getElementById('btnAndroid').classList.toggle('active', p === 'android');
     document.getElementById('btnIphone').classList.toggle('active', p === 'iphone');
+    document.getElementById('btnWindows').classList.toggle('active', p === 'windows');
     document.getElementById('panelAndroid').classList.toggle('show', p === 'android');
     document.getElementById('panelIphone').classList.toggle('show', p === 'iphone');
+    document.getElementById('panelWindows').classList.toggle('show', p === 'windows');
     try { localStorage.setItem('middagslotteri_landing_platform', p); } catch (e) {}
   }
 
@@ -181,22 +200,26 @@
     const ua = navigator.userAgent || '';
     let guess = 'android';
     if (/iPhone|iPad|iPod/.test(ua)) guess = 'iphone';
+    else if (/Windows/.test(ua) && !/Mobi/.test(ua)) guess = 'windows';
     let saved = null;
     try { saved = localStorage.getItem('middagslotteri_landing_platform'); } catch (e) {}
     selectPlatform(saved || guess);
   })();
 
-  // Real one-tap install on Android/Chrome: capture the native prompt event.
+  // Real one-tap install on Android/Chrome and desktop Chrome/Edge: capture
+  // the native prompt event, shared by both the Android and Dator panels
+  // since it's the same browser event regardless of device.
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', function (e) {
     e.preventDefault();
     deferredPrompt = e;
-    const btn = document.getElementById('installBtn');
-    btn.disabled = false;
+    document.getElementById('installBtn').disabled = false;
+    document.getElementById('installBtnWindows').disabled = false;
     document.getElementById('androidFallback').style.display = 'none';
+    document.getElementById('windowsFallback').style.display = 'none';
   });
 
-  function installAndroid() {
+  function installApp() {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     deferredPrompt.userChoice.finally(function () { deferredPrompt = null; });
@@ -206,7 +229,10 @@
   // already installed), show the manual fallback after a short wait instead
   // of leaving a dead disabled button.
   setTimeout(function () {
-    if (!deferredPrompt) document.getElementById('androidFallback').style.display = 'block';
+    if (!deferredPrompt) {
+      document.getElementById('androidFallback').style.display = 'block';
+      document.getElementById('windowsFallback').style.display = 'block';
+    }
   }, 1800);
 
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.protocol === 'http:')) {
