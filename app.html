@@ -1299,7 +1299,12 @@ Viltgryta: övrigt kött
     const payload = { __middagslotteriet_backup: true, version: 1, exportedAt: new Date().toISOString(), data: {} };
     for (const key of ALL_STORAGE_KEYS) {
       const v = await storage.get(key);
-      if (v !== null) payload.data[key] = v.value;
+      if (v === null) continue;
+      // Varje nyckel är sparad som en rå sträng i localStorage (listor/objekt
+      // är redan JSON-strängar). Parsa upp dem igen innan de läggs i payload,
+      // annars blir hela filen en enda dubbel-kodad, oläsbar textrad.
+      try { payload.data[key] = JSON.parse(v.value); }
+      catch (e) { payload.data[key] = v.value; }
     }
     const text = JSON.stringify(payload, null, 2);
     const blob = new Blob([text], { type: 'application/json;charset=utf-8' });
@@ -1332,7 +1337,12 @@ Viltgryta: övrigt kött
         const ok = confirm('Detta skriver över ALLT som finns i appen just nu på den här enheten — rätter, planering, inköpslista och inställningar — med innehållet i filen "' + file.name + '". Går inte att ångra. Vill du fortsätta?');
         if (!ok) { fileInput.value = ''; return; }
         for (const key of Object.keys(parsed.data)) {
-          await storage.set(key, parsed.data[key]);
+          const v = parsed.data[key];
+          // Nyare backuper har riktiga värden (nummer/listor/objekt) här;
+          // äldre backuper (innan denna fix) hade redan JSON-strängar.
+          // Stödja båda: localStorage vill alltid ha en sträng.
+          const str = (typeof v === 'string') ? v : JSON.stringify(v);
+          await storage.set(key, str);
         }
         await loadState();
         statusMsg = 'Allt importerat från backup — ' + dishes.length + ' rätter, planering och inställningar återställda.';
