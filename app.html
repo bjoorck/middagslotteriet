@@ -541,7 +541,7 @@ Halloumisallad med couscous: 400 g halloumi, 300 g couscous, 200 g körsbärstom
 Caesarsallad med kyckling: 300 g kycklingfilé, 1 st romansallad, 50 g parmesan, 100 g krutonger, 1 dl caesardressing, 1 tsk salt
 Grekisk sallad: 2 st tomat, 1 st gurka, 1 st rödlök, 150 g fetaost, 100 g kalamataoliver, 2 msk olivolja, 1 tsk oregano
 Kycklingsallad med mango: 300 g kycklingfilé, 1 st mango, 100 g sallad, 50 g cashewnötter, 2 msk olja, 1 tsk salt
-Räksallad med avokado: 300 g handskalade räkor, 2 st avokado, 1 st citron, 100 g sallad, 2 msk majonnäs, 1 tsk dill
+Räksallad med dill: 300 g handskalade räkor, 2 st avokado, 1 st citron, 100 g sallad, 2 msk majonnäs, 1 tsk dill
 Quinoasallad med halloumi: 250 g halloumi, 200 g quinoa, 150 g körsbärstomater, 2 msk olivolja, 1 tsk salt
 Pastasallad med skinka: 300 g pasta, 150 g skinka, 100 g majs, 100 g paprika, 1 dl majonnäs, 1 tsk salt
 Couscoussallad med granatäpple: 250 g couscous, 1 st granatäpple, 50 g mandel, 2 msk olivolja, 1 tsk salt
@@ -800,7 +800,7 @@ Shepherd's pie: övrigt kött
 Caesarsallad med kyckling: lätt rätt
 Grekisk sallad: lätt rätt
 Kycklingsallad med mango: lätt rätt
-Räksallad med avokado: lätt rätt
+Räksallad med dill: lätt rätt
 Quinoasallad med halloumi: lätt rätt
 Pastasallad med skinka: lätt rätt
 Couscoussallad med granatäpple: lätt rätt
@@ -1272,7 +1272,6 @@ Tomat- och mozzarellapaj: lätt rätt`;
 3. Stek falafelbollarna i olivolja på medelvärme, cirka 3–4 minuter per sida, tills de är genomstekta och gyllenbruna.
 4. Värm pitabröden enligt förpackningens anvisning.
 5. Fyll pitabröden med falafel och hummus.
-
 === Caesarsallad med kyckling ===
 1. Stek kycklingfiléerna i olja, krydda med salt, tills genomstekta. Låt svalna något och skiva.
 2. Riv romansalladen grovt och lägg i en stor skål.
@@ -1288,7 +1287,7 @@ Tomat- och mozzarellapaj: lätt rätt`;
 2. Skala och skär mangon i tärningar.
 3. Blanda sallad, kyckling och mango i en skål, toppa med rostade cashewnötter.
 
-=== Räksallad med avokado ===
+=== Räksallad med dill ===
 1. Skär avokadon i skivor och pressa över lite citron för att hindra missfärgning.
 2. Blanda majonnäs med dill och en skvätt citronsaft till en dressing.
 3. Varva sallad, räkor och avokado på tallrikar, ringla över dressingen.
@@ -2715,7 +2714,9 @@ Tomat- och mozzarellapaj: lätt rätt`;
     });
     function label(key) {
       const a = planAssignments[key];
-      return (a && a.name) ? a.name + (rester[key] ? ' (rester)' : '') : null;
+      if (!a || !a.name) return null;
+      const dish = findDish(a.name);
+      return (isLightDish(dish || {}) ? '🥗 ' : '') + a.name + (rester[key] ? ' (rester)' : '');
     }
     const lines = [];
     DAY_OPTIONS.forEach(function(day) {
@@ -2856,7 +2857,8 @@ Tomat- och mozzarellapaj: lätt rätt`;
           html += '<div class="candidate-row' + (count > 0 ? ' is-checked' : '') + '">';
           html += '<button class="fav-corner' + (dish && dish.favorite ? ' is-fav' : '') + '" onclick="toggleFavorite(' + nameAttr + ')" title="Favoriter lottas ' + favoriteWeight + ' gånger oftare">' + (dish && dish.favorite ? '★' : '☆') + '</button>';
           html += '<div class="candidate-body">';
-          html += '<div class="candidate-tap" onclick="cycleCandidate(' + nameAttr + ')"><div class="candidate-main-label">' + escapeHtml(name) + '</div>';
+          const isLight = isLightDish(dish || {});
+          html += '<div class="candidate-tap" onclick="cycleCandidate(' + nameAttr + ')"><div class="candidate-main-label">' + (isLight ? '🥗 ' : '') + escapeHtml(name) + '</div>';
           html += '<div class="candidate-ing-count">' + escapeHtml(ingredientText) + '</div>';
           html += '</div>';
           if (confirmRemoveName === name) {
@@ -2870,7 +2872,8 @@ Tomat- och mozzarellapaj: lätt rätt`;
             html += '<div class="candidate-fav-row">';
             html += '<button class="fav-toggle count-btn c' + Math.min(count, 2) + '" onclick="cycleCandidate(' + nameAttr + ')" title="Tryck: 1x → 2x → bort" aria-label="Antal: ' + count + '">' + (count === 0 ? '+' : (count >= 2 ? '2x' : '1x')) + '</button>';
             html += '<button class="fav-toggle recipe-btn' + (recipeVal ? ' has-recipe' : '') + '" onclick="recipeAction(' + nameAttr + ')" title="' + recipeTitle + '">' + recipeLabel + '</button>';
-            html += '<button class="fav-toggle swap-btn' + (count > 0 ? ' is-inactive' : '') + '" onclick="swapCandidate(' + nameAttr + ')" title="' + (count > 0 ? 'Kryssa ur rätten först för att byta ut den' : 'Lotta fram en annan rätt istället för den här') + '">Lotta en ny rätt</button>';
+            const swapLabel = isLight ? 'Lotta en ny lätt rätt' : 'Lotta en ny middag';
+            html += '<button class="fav-toggle swap-btn' + (count > 0 ? ' is-inactive' : '') + '" onclick="swapCandidate(' + nameAttr + ')" title="' + (count > 0 ? 'Kryssa ur rätten först för att byta ut den' : 'Lotta fram en annan rätt istället för den här') + '">' + swapLabel + '</button>';
             html += '<button class="fav-toggle remove-btn" onclick="askRemoveCand(' + nameAttr + ')" title="Ta bort rätten helt ur din receptlista">Ta bort ur receptlistan</button>';
             html += '</div>';
             if (recipeVal && (recipeOpenName === name || candEditName === name)) html += '<div class="candidate-fav-row" style="margin-top:8px;"><button class="fav-toggle' + (candEditName === name ? ' is-fav' : '') + '" onclick="toggleCandEdit(' + nameAttr + ')" title="Ändra eller skriv om receptet — klicka igen för att stänga">✏️ ' + (candEditName === name ? 'Stäng redigeringen' : 'Redigera receptet') + '</button></div>';
@@ -2966,14 +2969,14 @@ Tomat- och mozzarellapaj: lätt rätt`;
         }
       }
       html += '<div class="draw-count-box">';
-      html += '<div class="draw-count-label">Här kan du välja hur många rätter du vill lotta</div>';
+      html += '<div class="draw-count-label">🍽️ Middagar — här kan du välja hur många du vill lotta</div>';
       html += '<div class="draw-count-stepper">';
       html += '<button onclick="updateDrawCount(' + (drawCount - 1) + ')" title="Färre">−</button>';
       html += '<span class="draw-count-value">' + drawCount + '</span>';
       html += '<button onclick="updateDrawCount(' + (drawCount + 1) + ')" title="Fler">+</button>';
       html += '</div>';
       html += '</div>';
-      html += '<div class="hint" style="margin-top:0; margin-bottom:14px;">Styr hur många rätter som lottas fram varje gång du klickar på en av knapparna nedan — max 20 åt gången. Favoriter (★) har ' + favoriteWeight + ' gånger större chans att komma med.</div>';
+      html += '<div class="hint" style="margin-top:0; margin-bottom:14px;">Styr hur många middagar som lottas fram varje gång du klickar på en av knapparna nedan — max 20 åt gången. Favoriter (★) har ' + favoriteWeight + ' gånger större chans att komma med.</div>';
       html += '<div class="draw-count-box">';
       html += '<div class="draw-count-label">🥗 Lätta rätter (sallader, smörgåsar, tillbehör, pajer m.m.) — valfritt</div>';
       html += '<div class="draw-count-stepper">';
@@ -2986,10 +2989,10 @@ Tomat- och mozzarellapaj: lätt rätt`;
       const keepCount = candidates.filter(function(n) { return selected.indexOf(n) >= 0; }).length;
       if (keepCount > 0) {
         html += '<button class="draw-btn" onclick="redrawKeepSelected()">Behåll ' + keepCount + ' valda, lotta om resten</button>';
-        html += '<div class="hint" style="margin-top:8px; margin-bottom:0;">Behåller de ikryssade rätterna och fyller på med nya förslag upp till ' + drawCount + '. Inköpslistan rörs inte.</div>';
-        html += '<button class="draw-btn-blue" style="margin-top:28px;" onclick="requestNewWeek(\'board\')">Lotta ' + drawCount + ' helt nya rätter</button>';
+        html += '<div class="hint" style="margin-top:8px; margin-bottom:0;">Behåller de ikryssade rätterna och fyller på med nya förslag — middagar och lätta rätter var för sig. Inköpslistan rörs inte.</div>';
+        html += '<button class="draw-btn-blue" style="margin-top:28px;" onclick="requestNewWeek(\'board\')">Lotta ' + drawCount + ' helt nya middagar</button>';
       } else {
-        html += '<button class="draw-btn" onclick="requestNewWeek(\'board\')">' + (candidates.length ? 'Lotta ' + drawCount + ' nya rätter' : 'Lotta ' + drawCount + ' rätter') + '</button>';
+        html += '<button class="draw-btn" onclick="requestNewWeek(\'board\')">' + (candidates.length ? 'Lotta ' + drawCount + ' nya middagar' : 'Lotta ' + drawCount + ' middagar') + '</button>';
       }
       if (confirmNewWeek === 'board') {
         html += newWeekConfirmHtml();
@@ -3130,7 +3133,7 @@ Tomat- och mozzarellapaj: lätt rätt`;
       } else {
         filtered.forEach(function(d) {
           html += '<div class="dish-manage-row">';
-          html += '<div><div class="dish-manage-name">' + (d.favorite ? '<span class="fav-mark">★</span> ' : '') + ((d.recipe || '').trim() ? '📖 ' : '') + escapeHtml(d.name) + '</div>';
+          html += '<div><div class="dish-manage-name">' + (d.favorite ? '<span class="fav-mark">★</span> ' : '') + (isLightDish(d) ? '🥗 ' : '') + ((d.recipe || '').trim() ? '📖 ' : '') + escapeHtml(d.name) + '</div>';
           html += '<div class="candidate-ing-count">' + (d.ingredients.length ? escapeHtml(ingredientsToString(d.ingredients)) : 'inga ingredienser');
           if (d.tags && d.tags.length) html += ' · 🏷️ ' + escapeHtml(d.tags.join(', '));
           html += '</div></div>';
