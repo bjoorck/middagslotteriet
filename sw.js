@@ -1,4 +1,4 @@
-const CACHE_NAME = 'middagslotteriet-v14';
+const CACHE_NAME = 'middagslotteriet-v16';
 const urlsToCache = ['./', './index.html', './app.html', './manual.html'];
 
 self.addEventListener('install', function (event) {
