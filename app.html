@@ -3202,6 +3202,8 @@ Krämig pumpasoppa med ingefära: övrigt recept, soppa`;
   let excludedCategories = []; // kategorier du valt bort ur middagslottningen just nu
   let showFilterPanel = false;
   const FILTER_CATEGORIES = ['vegetariskt', 'gris', 'nöt', 'kyckling', 'fisk', 'övrigt kött'];
+  let showMainBrowse = false; // visar/döljer "Bläddra & välj själv"-listan för middagar
+  let mainBrowseSearch = '';  // sökfält i den listan
   let excludedLightCategories = []; // kategorier du valt bort ur lottningen av övriga recept just nu
   let showLightFilterPanel = false;
   let showLightBrowse = false; // visar/döljer "Bläddra & välj själv"-listan för övriga recept
@@ -3307,6 +3309,19 @@ Krämig pumpasoppa med ingefära: övrigt recept, soppa`;
     if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
   }
 
+  function toggleMainBrowse() {
+    showMainBrowse = !showMainBrowse;
+    mainBrowseSearch = '';
+    render();
+  }
+
+  function handleMainBrowseSearch(value) {
+    mainBrowseSearch = value;
+    render();
+    const el = document.getElementById('mainBrowseInput');
+    if (el) { el.focus(); el.setSelectionRange(el.value.length, el.value.length); }
+  }
+
   // Bläddringslista för övriga recept: grupperad per underkategori, ett klick lägger till
   // och väljer rätten direkt (samma som addToLot) — inget lottande eller extra klick behövs.
   function lightBrowseHtml() {
@@ -3337,6 +3352,45 @@ Krämig pumpasoppa med ingefära: övrigt recept, soppa`;
         out += '<div class="hint" style="margin:14px 0 4px; font-weight:600; color:var(--chalk-dim);">Övrigt</div>';
         out += '<div class="slot-picker-list">';
         uncategorized.forEach(function(d) {
+          out += '<div class="slot-picker-row" onclick="addToLot(' + JSON.stringify(d.name).replace(/"/g, '&quot;') + ')">' + (d.favorite ? '★ ' : '') + escapeHtml(d.name) + '</div>';
+        });
+        out += '</div>';
+      }
+    }
+    out += '</div>';
+    return out;
+  }
+
+  // Bläddringslista för middagar: grupperad per kategori, ett klick lägger till och väljer
+  // rätten direkt (samma som addToLot) — inget lottande eller extra klick behövs.
+  function mainBrowseHtml() {
+    let out = '<div class="filter-panel" style="margin-bottom:14px;">';
+    out += '<input type="text" id="mainBrowseInput" class="text-input" placeholder="Sök bland middagar..." value="' + escapeHtml(mainBrowseSearch) + '" oninput="handleMainBrowseSearch(this.value)">';
+    const mq = mainBrowseSearch.trim().toLowerCase();
+    const mainPool = dishes.filter(function(d) {
+      return !isLightDish(d) && candidates.indexOf(d.name) < 0 && (!mq || d.name.toLowerCase().indexOf(mq) >= 0);
+    });
+    if (mainPool.length === 0) {
+      out += '<div class="hint" style="margin-top:10px;">' + (mq ? 'Inga middagar matchar sökningen.' : 'Inga fler middagar att välja bland — allt ligger redan i listan nedan.') + '</div>';
+    } else {
+      FILTER_CATEGORIES.forEach(function(cat) {
+        const inCat = mainPool.filter(function(d) { return (d.tags || []).indexOf(cat) >= 0; })
+          .sort(function(a, b) { return a.name.localeCompare(b.name, 'sv'); });
+        if (inCat.length === 0) return;
+        out += '<div class="hint" style="margin:14px 0 4px; font-weight:600; color:var(--chalk-dim);">' + escapeHtml(cat.charAt(0).toUpperCase() + cat.slice(1)) + '</div>';
+        out += '<div class="slot-picker-list">';
+        inCat.forEach(function(d) {
+          out += '<div class="slot-picker-row" onclick="addToLot(' + JSON.stringify(d.name).replace(/"/g, '&quot;') + ')">' + (d.favorite ? '★ ' : '') + escapeHtml(d.name) + '</div>';
+        });
+        out += '</div>';
+      });
+      // Middagar utan någon av kategorierna (bör inte hända, men visa dem ändå).
+      const mainUncategorized = mainPool.filter(function(d) { return !FILTER_CATEGORIES.some(function(cat) { return (d.tags || []).indexOf(cat) >= 0; }); })
+        .sort(function(a, b) { return a.name.localeCompare(b.name, 'sv'); });
+      if (mainUncategorized.length > 0) {
+        out += '<div class="hint" style="margin:14px 0 4px; font-weight:600; color:var(--chalk-dim);">Övrigt</div>';
+        out += '<div class="slot-picker-list">';
+        mainUncategorized.forEach(function(d) {
           out += '<div class="slot-picker-row" onclick="addToLot(' + JSON.stringify(d.name).replace(/"/g, '&quot;') + ')">' + (d.favorite ? '★ ' : '') + escapeHtml(d.name) + '</div>';
         });
         out += '</div>';
@@ -4826,6 +4880,10 @@ Krämig pumpasoppa med ingefära: övrigt recept, soppa`;
       html += '</div>';
       html += '</div>';
       html += '<div class="hint" style="margin-top:0; margin-bottom:14px;">Styr hur många middagar som lottas fram varje gång du klickar på en av knapparna nedan — 0–20 åt gången. Står den på 0 lottas inga middagar alls (bra om du bara vill lotta övriga recept). Favoriter (★) har ' + favoriteWeight + ' gånger större chans att komma med.</div>';
+      html += '<div style="text-align:center; margin-bottom:14px;">';
+      html += '<button class="more-action" onclick="toggleMainBrowse()">' + (showMainBrowse ? '✕ Stäng listan' : '🧭 Bläddra & välj själv') + '</button>';
+      html += '</div>';
+      if (showMainBrowse) html += mainBrowseHtml();
 
       html += '<h3 class="draw-section-heading">🍴 Övriga recept <span class="draw-section-sub">— sallader, smörgåsar, soppor, bakverk, pajer m.m. (valfritt)</span></h3>';
       {
