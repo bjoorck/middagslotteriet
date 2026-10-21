@@ -4726,7 +4726,7 @@ Krämig pumpasoppa med ingefära: övrigt recept, soppa`;
     // kontot är godkänt.
     html += '<div style="max-width:320px; height:50px; margin:0 auto 14px; background:#e8d3ce; border:1px dashed var(--chalk-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--chalk-dim); font-size:0.8rem;">Annons (platshållare, 320×50)</div>';
     html += '<div style="display:flex; align-items:baseline; justify-content:center; gap:10px; flex-wrap:wrap;"><h1 style="margin-bottom:0;">Middagslotteriet</h1><a href="manual.html" class="link-btn" style="font-size:0.85rem;">Hjälp / manual</a></div>';
-    html += '<p class="subtitle">Lotta upp till 20, välj de du vill ha, få en inköpslista</p>';
+    html += '<p class="subtitle">Lotta middagar och övriga recept, välj de du vill ha och få en inköpslista som du kan ändra efter vad du redan har hemma. Du kan även välja rätter direkt utan att lotta.</p>';
     html += '<div class="board">';
 
     if (dishes.length === 0) {
@@ -4744,11 +4744,17 @@ Krämig pumpasoppa med ingefära: övrigt recept, soppa`;
     } else {
       if (candidates.length > 0) {
         html += '<div class="select-count">' + selected.length + ' valda (dubbletter inräknade)</div>';
-        html += '<div class="hint" style="text-align:center; margin:4px 0 0;">Tryck på rutan till vänster (eller på rätten): 1 tryck = 1x, 2 tryck = 2x (två dagar i rad), 3 tryck = bort. När en rätt är vald kan du ändra dag med rullisten — samma dag för flera rätter ger upp till fyra rätter den dagen, därefter hamnar nästa rätt i stället på en annan dag. Välj "Extra" för rätter utan fast dag (t.ex. luncher). ' + favWeightHtml() + '</div>';
+        html += '<div class="hint" style="text-align:center; margin:4px 0 0;">Tryck på rutan till vänster (eller på rätten): 1 tryck = 1x, 2 tryck = 2x, 3 tryck = bort. När en rätt är vald kan du ändra dag med rullisten — samma dag för flera rätter ger upp till fyra rätter den dagen, därefter hamnar nästa rätt i stället på en annan dag. Välj "Extra" för rätter utan fast dag. ' + favWeightHtml() + '</div>';
         if (listMsg) html += '<div class="hint" style="text-align:center; color:var(--sage); margin:6px 0 0;">' + escapeHtml(listMsg) + '</div>';
         html += '<div class="candidate-list">';
+        let prevWasLight = null;
         candidates.forEach(function(name, i) {
           const dish = findDish(name);
+          const rowIsLight = isLightDish(dish || {});
+          if (rowIsLight !== prevWasLight) {
+            html += '<h3 class="draw-section-heading" style="font-size:1.6rem;' + (i === 0 ? ' margin-top:4px; padding-top:0; border-top:none;' : '') + '">' + (rowIsLight ? '🍴 Övriga recept' : '🍽️ Middagar') + '</h3>';
+            prevWasLight = rowIsLight;
+          }
           const count = selected.filter(function(n) { return n === name; }).length;
           const ingredientText = dish && dish.ingredients.length > 0 ? ingredientsToString(dish.ingredients) : 'inga ingredienser sparade';
           const nameAttr = JSON.stringify(name).replace(/"/g, '&quot;');
